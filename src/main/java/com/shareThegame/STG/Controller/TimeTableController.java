@@ -55,7 +55,7 @@ class TimeTableController {
 
 
         postEndRent = pasreDate ( end );
-        Date postEndRentDate = postEndRent.toDate ( );
+        Date postEndRentDate = postEndRent.toDate ( ); 
         if ( timeTableList.size ( ) > 0 ) {
 
             isFree = chceckAvalabile ( timeTableList , postStartRentDate , postEndRentDate );
