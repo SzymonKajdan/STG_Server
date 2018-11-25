@@ -157,7 +157,7 @@ class UserServiceTest {
         paymentHisotry.setExprrent ( new DateTime ( 2018 , 11 , 20 , 19 , 00 ).toDate ( ) );
         paymentHisotry.setStartrent ( new DateTime ( 2018 , 11 , 20 , 18 , 00 ).toDate ( ) );
 
-        if ( paymentHistoryRepository.findByUserid ( ( long ) 1 ) == null ) {
+        if ( paymentHistoryRepository.findAll ().size () == 0 ) {
             paymentHistoryRepository.save ( paymentHisotry );
         }
 

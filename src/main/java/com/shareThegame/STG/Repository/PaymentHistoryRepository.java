@@ -11,6 +11,7 @@ import java.util.List;
 public
 interface PaymentHistoryRepository extends JpaRepository<PaymentHisotry,Long> {
     PaymentHisotry findByUserid(Long userid);
+    PaymentHisotry findBySportobjectid(Long sportobjectid);
     PaymentHisotry findBySportobjectidAndAndStartrentAndExprrent( Long sportobjectid, Date startrent,Date exprent );
     List<PaymentHisotry> findAll();
 }

@@ -72,15 +72,7 @@ public class UserController {
     public @ResponseBody
     String logIn ( @Valid User user ) throws JSONException {
         JSONObject jsonObject = new JSONObject ( );
-        String username;
-        try {
-            org.springframework.security.core.userdetails.User currentUser =
-                    ( org.springframework.security.core.userdetails.User ) SecurityContextHolder.getContext ( ).getAuthentication ( ).getPrincipal ( );
-            username = currentUser.getUsername ( );
-        } catch ( ClassCastException e ) {
-            username = "anonymousUser";
-            return "{}";
-        }
+        String username=userAuth ();
 
 
         if ( user != null && user.getUsername ( ) != null && user.getPassword ( ) != null ) {
@@ -110,16 +102,7 @@ public class UserController {
     public @ResponseBody
     String ResetPassword( @Valid User user,String newPassword ) throws JSONException {
         JSONObject jsonObject = new JSONObject ( );
-        String username;
-        try {
-            org.springframework.security.core.userdetails.User currentUser =
-                    ( org.springframework.security.core.userdetails.User ) SecurityContextHolder.getContext ( ).getAuthentication ( ).getPrincipal ( );
-            username = currentUser.getUsername ( );
-        } catch ( ClassCastException e ) {
-            username = "anonymousUser";
-            return "{}";
-        }
-
+        String username=userAuth ();
         if(userRepository.findByEmail ( username ).getUsername ().equals (   user.getUsername () )){
            // User userExist = userRepository.findByEmail ( username).getPassword ();
             if(userService.comaprePassword ( userRepository.findByEmail ( username).getPassword (),user.getPassword () )){
@@ -145,26 +128,7 @@ public class UserController {
     public
     String giveBackUser(  ) throws JSONException, JsonProcessingException {
 
-        String username;
-        try {
-            org.springframework.security.core.userdetails.User currentUser =
-                    ( org.springframework.security.core.userdetails.User ) SecurityContextHolder.getContext ( ).getAuthentication ( ).getPrincipal ( );
-            username = currentUser.getUsername ( );
-        } catch ( ClassCastException e ) {
-            username = "anonymousUser";
-            return "{}";
-        }
-//       User usertoGive=userRepository.findByEmail ( username );
-//        List<SportObject> xp=usertoGive.getSportObjects ();
-//
-//        List<TimeTable>ttr=tt.findAllBySportobjectid ( (long)1 );
-//        System.out.println (ttr.size () );
-//        for(int i=0;i<xp.size ();i++) {
-//            System.out.println ("wynajecie" +new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(usertoGive));
-//        }
-//
-//
-//        String Json= new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(usertoGive.getPassword ());
+        String username=userAuth ();
         List <User> list = new ArrayList <> ( );
 
         User usertoGive = userRepository.findByEmail ( username );
@@ -176,6 +140,19 @@ public class UserController {
          return  jsonObject.toString ();
     }
 
+    private String userAuth(){
+
+        String username;
+        try {
+            org.springframework.security.core.userdetails.User currentUser =
+                    ( org.springframework.security.core.userdetails.User ) SecurityContextHolder.getContext ( ).getAuthentication ( ).getPrincipal ( );
+            username = currentUser.getUsername ( );
+            return  username;
+        } catch ( ClassCastException e ) {
+            username = "anonymousUser";
+            return "{}";
+        }
+    }
 
 }
 

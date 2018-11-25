@@ -5,7 +5,7 @@ import java.util.Date;
 
 @Entity
 public
-class TimeTable {
+class TimeTable implements  Comparable<TimeTable> {
     @Id
     @GeneratedValue ( strategy = GenerationType.IDENTITY )
     private long id;
@@ -91,5 +91,12 @@ class TimeTable {
     }
 
 
-
+    @Override
+    public
+    int compareTo ( TimeTable o ) {
+        if (getStartrent () == null || o.getStartrent () == null) {
+            return 0;
+        }
+        return getStartrent ().compareTo(o.getStartrent ());
+    }
 }
