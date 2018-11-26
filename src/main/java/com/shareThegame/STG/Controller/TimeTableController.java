@@ -55,7 +55,7 @@ class TimeTableController {
 
 
         postEndRent = pasreDate ( end );
-        Date postEndRentDate = postEndRent.toDate ( ); 
+        Date postEndRentDate = postEndRent.toDate ( );
         if ( timeTableList.size ( ) > 0 ) {
 
             isFree = chceckAvalabile ( timeTableList , postStartRentDate , postEndRentDate );
@@ -154,7 +154,6 @@ class TimeTableController {
             TimeTable timeTableToChange = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( oldPostStartRentDate , oldPostEndRentDate , sportobjectid );
             if ( timeTableToChange != null ) {
 
-//iniit
                 String username = userAuth ( );
                 User user = userRepository.findByEmail ( username );
                 SportObject sportObject = sportObjectReposiotry.getOne ( timeTableToChange.getSportobjectid ( ) );
@@ -178,6 +177,7 @@ class TimeTableController {
                 timeTable1.setEndrend ( newPostEndRentDate );
                 timeTable1.setSportobjectid ( sportobjectid );
                 timeTable1.setRenterid ( user.getId ( ) );
+
                 double time = newPostEndRent.toDate ( ).getTime ( ) - newPostStartRent.toDate ( ).getTime ( );
                 time /= 3600000;
                 timeTable1.setPrice ( time * sportObject.getRentprice ( ) );
@@ -197,16 +197,13 @@ class TimeTableController {
 
                 paymentHistoryRepository.save ( paymentHisotry1 );
 
-                //  System.out.println ( paymentHisotry.getId ( ) );
+
                 user.getPaymentHisotries ( ).add ( paymentHisotry1 );
                 sportObject.getPaymentHisotries ( ).add ( paymentHisotry1 );
 
                 userRepository.save ( user );
                 timeTableReposiotry.save ( timeTable1 );
                 sportObjectReposiotry.save ( sportObject );
-
-
-                //  System.out.println (time );
 
 
                 sportObject.getTimeTable ( ).add ( timeTable1 );

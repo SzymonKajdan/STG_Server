@@ -47,7 +47,8 @@ class UserServiceTest {
     private ObjectPhotoService objectPhotoService;
     @Autowired
     private ObjectStarsRepository objectStarsRepository;
-
+    @Autowired
+    private FavouriteObjectsRepository favouriteObjectsRepository;
     @PostConstruct
     public
     void setUp ( ) {
@@ -90,7 +91,13 @@ class UserServiceTest {
         //objectStars.setSportObject ( sportObject );
         objectStarsRepository.save ( objectStars );
 
-
+//ulubione obiekty
+        FavouriteObjects favouriteObject = new FavouriteObjects ();
+        favouriteObject.setSportobjectid ( (long) 1 );
+        favouriteObject.setUserid ( (long)1 );
+        if(favouriteObjectsRepository.findByUserid (( long) 1 ).size ()==0){
+        favouriteObjectsRepository.save ( favouriteObject );
+        }
 //terminarz dla hali nr 1
         TimeTable timeTable = new TimeTable ( );
         timeTable.setPrice ( ( long ) 100 );
@@ -102,7 +109,7 @@ class UserServiceTest {
         timeTable.setStartrent ( start );
         timeTable.setEndrend ( end );
         timeTable.setSportobjectid ( ( long ) 1 );
-        if ( timeTableReposiotry.findBySportobjectid ( ( long ) 1 ) == null ) {
+        if ( timeTableReposiotry.findAllBySportobjectid ( ( long ) 1 ).size () == 0 ) {
             timeTableReposiotry.save ( timeTable );
         }
 //Widocznosc peirwszej hali w mapach
@@ -199,6 +206,8 @@ class UserServiceTest {
 
         test.setSportObjects ( new ArrayList <> ( ) );
         test.getSportObjects ( ).add ( sportObject );
+        test.setFavouriteObjects ( new ArrayList <> (  ) );
+        test.getFavouriteObjects ().add ( favouriteObject );
 
 
         if ( userRepository.findByUsername ( "admin" ) == null ) {
@@ -206,7 +215,10 @@ class UserServiceTest {
             System.out.println ( "inializuje uytkonikow" );
             test.setPaymentHisotries ( new ArrayList <> ( ) );
             test.getPaymentHisotries ( ).add ( paymentHisotry );
+            //test.getFavouriteObjects ().add ( favouriteObject );
             userService.saveUser ( test );
+            favouriteObject.setUser ( test );
+            favouriteObjectsRepository.save ( favouriteObject );
 
         }
 

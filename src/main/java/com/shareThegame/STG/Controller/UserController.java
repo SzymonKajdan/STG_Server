@@ -51,6 +51,7 @@ public class UserController {
                 }
                 user.setSportObjects ( new ArrayList <> (  ) );
                 user.setPaymentHisotries ( new ArrayList <> (  ) );
+                user.setFavouriteObjects ( new ArrayList <> (  ) );
                 user.setActive ( 1 );
 
                 userService.saveUser ( user );

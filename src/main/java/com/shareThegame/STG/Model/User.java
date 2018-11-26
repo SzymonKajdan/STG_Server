@@ -5,6 +5,7 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.util.Base64;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +25,22 @@ public class User {
 
     private int active;
 
+    private byte[] photo;
 
+    @ManyToMany
+    @JoinTable ( name = "user_role", joinColumns = @JoinColumn ( name = "user_id" ), inverseJoinColumns = @JoinColumn ( name = "role_id" ) )
+    private List<Role> roles;
+
+    @OneToMany
+    private  List<SportObject> sportObjects;
+
+    @NotFound (action = NotFoundAction.IGNORE)
+    @OneToMany
+    private  List<PaymentHisotry>paymentHisotries;
+
+
+    @OneToMany
+    List<FavouriteObjects> favouriteObjects;
 
 
     public long getId( ) {
@@ -103,19 +119,30 @@ public class User {
         return paymentHisotries;
     }
 
+
     public
     void setPaymentHisotries ( List <PaymentHisotry> paymentHisotries ) {
         this.paymentHisotries = paymentHisotries;
     }
 
-    @ManyToMany
-    @JoinTable ( name = "user_role", joinColumns = @JoinColumn ( name = "user_id" ), inverseJoinColumns = @JoinColumn ( name = "role_id" ) )
-    private List<Role> roles;
 
-    @OneToMany
-    private  List<SportObject> sportObjects;
-    @NotFound (action = NotFoundAction.IGNORE)
-    @OneToMany
-    private  List<PaymentHisotry>paymentHisotries;
+    public
+    String getPhoto ( ) {
+        return Base64.getEncoder().encodeToString(photo);
+    }
 
+    public
+    void setPhoto ( byte[] photo ) {
+        this.photo = photo;
+    }
+
+    public
+    List <FavouriteObjects> getFavouriteObjects ( ) {
+        return favouriteObjects;
+    }
+
+    public
+    void setFavouriteObjects ( List <FavouriteObjects> favouriteObjects ) {
+        this.favouriteObjects = favouriteObjects;
+    }
 }
