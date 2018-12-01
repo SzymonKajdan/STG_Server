@@ -55,6 +55,10 @@ public class SportObject {
 
     private  String phoneno;
 
+    private  String open;
+
+    private  String close;
+
 
     @OneToMany
     private List<TimeTable> timeTable;
@@ -74,7 +78,7 @@ public class SportObject {
     @OneToMany
     private  List<ObjectStars> objectStars;
 
-
+    @JSONPropertyIgnore
     public
     User getUser ( ) {
         return user;
@@ -324,5 +328,25 @@ public class SportObject {
     public
     void setName ( String name ) {
         this.name = name;
+    }
+
+    public
+    String getOpen ( ) {
+        return open;
+    }
+
+    public
+    void setOpen ( String open ) {
+        this.open = open;
+    }
+
+    public
+    String getClose ( ) {
+        return close;
+    }
+
+    public
+    void setClose ( String close ) {
+        this.close = close;
     }
 }

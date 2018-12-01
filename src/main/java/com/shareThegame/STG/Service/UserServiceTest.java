@@ -4,6 +4,7 @@ package com.shareThegame.STG.Service;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
 import org.joda.time.DateTime;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -176,6 +177,8 @@ class UserServiceTest {
             sportObject.getObjectPhotos ( ).add ( objectPhoto );
             sportObject.getPaymentHisotries ( ).add ( paymentHisotry );
             sportObject.getObjectStars ( ).add ( objectStars );
+            sportObject.setOpen ( "06:00" );
+            sportObject.setClose ( "18:00" );
 
             System.out.println ( "pierwsza hala dodana" );
             sportObjectReposiotry.save ( sportObject );
@@ -203,11 +206,14 @@ class UserServiceTest {
         test.setEmail ( "22321@dsaas.co" );
         test.setActive ( 1 );
         test.setPhoneno ( "790 540 834" );
-
+        test.setLastname ( "Kajdan" );
+        test.setFirstname ( "Szymon" );
+        test.setDateofbirth ( new DateTime (   1996,11,03 ,0,0,0).toDate ());
         test.setSportObjects ( new ArrayList <> ( ) );
         test.getSportObjects ( ).add ( sportObject );
         test.setFavouriteObjects ( new ArrayList <> (  ) );
         test.getFavouriteObjects ().add ( favouriteObject );
+
 
 
         if ( userRepository.findByUsername ( "admin" ) == null ) {
@@ -215,8 +221,15 @@ class UserServiceTest {
             System.out.println ( "inializuje uytkonikow" );
             test.setPaymentHisotries ( new ArrayList <> ( ) );
             test.getPaymentHisotries ( ).add ( paymentHisotry );
-            //test.getFavouriteObjects ().add ( favouriteObject );
+          //  test.getFavouriteObjects ().add ( favouriteObject );
+
+
             userService.saveUser ( test );
+            sportObject.setUser ( test );
+            sportObjectReposiotry.save ( sportObject );
+            paymentHisotry.setSportObject ( sportObject );
+            paymentHisotry.setUser ( test );
+
             favouriteObject.setUser ( test );
             favouriteObjectsRepository.save ( favouriteObject );
 

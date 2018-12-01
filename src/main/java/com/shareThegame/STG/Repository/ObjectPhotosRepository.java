@@ -11,4 +11,5 @@ public
 interface ObjectPhotosRepository extends JpaRepository<ObjectPhotos,Long> {
     ObjectPhotos findBySportobjectid(Long sportobjectid);
     List<ObjectPhotos> findAllBySportobjectid(Long sportobjectid);
+
 }

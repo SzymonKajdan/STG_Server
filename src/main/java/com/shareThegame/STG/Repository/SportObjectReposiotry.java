@@ -16,9 +16,12 @@ public interface SportObjectReposiotry  extends  JpaRepository<SportObject,Long>
     SportObject findByActive(int active);
     SportObject findByPpmail(String ppmail);
     SportObject getOne(Long id);
+    List<SportObject>findByUser(User user);
     List<SportObject> findAllByCity( String city);
     List<SportObject>findAllByActive(int active);
     List<SportObject>findAllById(Long id );
     List<SportObject>findAllByTimeTable( TimeTable timeTable );
+    List<SportObject>findAllByOwnid(Long ownid);
+
 
 }

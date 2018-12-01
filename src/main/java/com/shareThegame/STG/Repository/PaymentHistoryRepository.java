@@ -1,6 +1,8 @@
 package com.shareThegame.STG.Repository;
 
 import com.shareThegame.STG.Model.PaymentHisotry;
+import com.shareThegame.STG.Model.SportObject;
+import com.shareThegame.STG.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,7 @@ interface PaymentHistoryRepository extends JpaRepository<PaymentHisotry,Long> {
     PaymentHisotry findBySportobjectid(Long sportobjectid);
     PaymentHisotry findBySportobjectidAndAndStartrentAndExprrent( Long sportobjectid, Date startrent,Date exprent );
     List<PaymentHisotry> findAll();
+    List<PaymentHisotry>findAllBySportobjectid(Long sportobjectid);
+    List<PaymentHisotry>findAllByUser( User user);
+    List<PaymentHisotry>findAllBySportObject( SportObject sportObject );
 }

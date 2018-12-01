@@ -5,7 +5,9 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import java.security.PrivateKey;
 import java.util.Base64;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -22,6 +24,14 @@ public class User {
     private String password;
 
     private String phoneno;
+
+    private String firstname;
+
+    private  String lastname;
+
+    private  String paypalemail;
+
+    private Date dateofbirth;
 
     private int active;
 
@@ -144,5 +154,45 @@ public class User {
     public
     void setFavouriteObjects ( List <FavouriteObjects> favouriteObjects ) {
         this.favouriteObjects = favouriteObjects;
+    }
+
+    public
+    String getFirstname ( ) {
+        return firstname;
+    }
+
+    public
+    void setFirstname ( String firstname ) {
+        this.firstname = firstname;
+    }
+
+    public
+    String getLastname ( ) {
+        return lastname;
+    }
+
+    public
+    void setLastname ( String lastname ) {
+        this.lastname = lastname;
+    }
+
+    public
+    Date getDateofbirth ( ) {
+        return dateofbirth;
+    }
+
+    public
+    void setDateofbirth ( Date dateofbirth ) {
+        this.dateofbirth = dateofbirth;
+    }
+
+    public
+    String getPaypalemail ( ) {
+        return paypalemail;
+    }
+
+    public
+    void setPaypalemail ( String paypalemail ) {
+        this.paypalemail = paypalemail;
     }
 }

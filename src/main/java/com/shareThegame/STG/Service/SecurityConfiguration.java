@@ -64,9 +64,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/h2/**").permitAll();
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll();
         http.authorizeRequests().antMatchers("/client/**").hasAnyAuthority("CLIENT").and ().httpBasic ();
-        http.authorizeRequests().antMatchers("/reqister").permitAll ();
+        //user
+        http.authorizeRequests().antMatchers("/register").permitAll ();
         http.authorizeRequests().antMatchers("/login").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/resetPassword").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        http.authorizeRequests().antMatchers("/updateProfile").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        http.authorizeRequests().antMatchers("/deleteUser").hasAnyAuthority("CLIENT").and ().httpBasic ();
 
         http.authorizeRequests().antMatchers("getObjecByCity").permitAll();
         http.authorizeRequests().antMatchers("addObject").hasAnyAuthority("CLIENT").and ().httpBasic ();

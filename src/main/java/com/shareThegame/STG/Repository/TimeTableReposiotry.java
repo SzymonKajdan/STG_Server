@@ -14,5 +14,5 @@ public interface TimeTableReposiotry extends JpaRepository<TimeTable,Long> {
     TimeTable findBySportobjectid(Long sportobjectid);
     ArrayList<TimeTable> findAllBySportobjectid( Long sportobjectid);
     TimeTable  findByStartrentAndEndrendAndSportobjectid( Date startrent,Date endrent,Long sportobjectid );
-
+    List<TimeTable> findAllBysportobjectid(Long sportobjectid);
 }

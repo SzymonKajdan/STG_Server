@@ -47,23 +47,7 @@ class SportObjectController {
         JSONObject jsonObject=new JSONObject (  );
         Map<String,Object> lista_hal = new HashMap<>();
         List<SportObject>ObjectinCity= sportObjectReposiotry.findAllByCity ( city );
-        for(SportObject spiterstor:ObjectinCity){
-            System.out.println (ObjectinCity.size () );
 
-
-//            lista_hal.put ("miasto",spiterstor.getCity () );
-//            lista_hal.put ( "adress",spiterstor.getAdress () );
-//            lista_hal.put ( "timetable",spiterstor.getTimeTable () );
-//            lista_hal.put ( "obectphoto",spiterstor.getObjectPhotos () );
-           // lista_hal.put()
-
-
-
-
-
-
-
-        }
         jsonObject.put ( "Terminarz",ObjectinCity );
 
         return jsonObject.toString ();
