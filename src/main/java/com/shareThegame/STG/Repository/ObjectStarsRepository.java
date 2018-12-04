@@ -8,4 +8,5 @@ import java.util.List;
 public
 interface ObjectStarsRepository extends JpaRepository<ObjectStars,Long> {
 List<ObjectStars> findAllBySportobjectid(Long sportobjectid);
+ObjectStars findBySportobjectidAndUserid(Long sportobjectid,Long userid);
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
 import java.text.ParseException;
 
@@ -114,6 +115,46 @@ class TimeTableController {
         return jsonObject.toString ( );
 
     }
+    @PostMapping ( value = "/returnTimetableOfSportObject", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+     String returnTimetableOfSportObject(Long sportobjectid, String day,String dayend){
+        DateTime start=pasreDate ( day );
+        DateTime end=pasreDate ( dayend );
+
+        List<TimeTable> timeTableList=timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore ( sportobjectid,start.toDate (),end.toDate () );
+        SportObject sp=sportObjectReposiotry.getOne ( sportobjectid );
+
+
+
+        //System.out.println (timeTableList.size () );
+
+        int size=sp.calc ();
+        //System.out.println (size );
+        String tmp=new String (  );
+        for(int i=0;i<size;i++){
+            tmp+="0";
+        }
+        StringBuilder timetabletoreturn=new StringBuilder (tmp  );
+        sp.getOpen ();
+        Date localopen=sp.getDate ( sp.getOpen () );
+
+
+
+        for(TimeTable item:timeTableList){
+            int first=getHourCount (localopen, item.getStartrent () );
+            int last=getHourCount (localopen, item.getEndrend () )-1;;
+            System.out.println ("pocztaek "+first+ "    "  + " koniuec " +last);
+            for(int i=first;i<last;i++){
+
+                timetabletoreturn.setCharAt ( i,'1' );
+            }
+
+        }
+        JSONObject jsonObject =new JSONObject (  );
+        jsonObject.put ( "termianrz",timetabletoreturn );
+
+        return jsonObject.toString () ;
+    }
 
     @PostMapping ( value = "/ChangeReservation", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
@@ -161,17 +202,7 @@ class TimeTableController {
                 // System.out.println (oldPostStartRentDate);
 
                 //delete old reserv
-                sportObject.getTimeTable ( ).remove ( timeTableToChange );
-                sportObject.getPaymentHisotries ( ).remove ( paymentHisotry );
-                user.getPaymentHisotries ( ).remove ( paymentHisotry );
-
-
-                userRepository.save ( user );
-                sportObjectReposiotry.save ( sportObject );
-
-                paymentHistoryRepository.delete ( paymentHisotry );
-                timeTableReposiotry.delete ( timeTableToChange );
-
+              deleteReserv ( timeTableToChange,user );
                 TimeTable timeTable1 = new TimeTable ( );
                 timeTable1.setStartrent ( newPostStartRentDate );
                 timeTable1.setEndrend ( newPostEndRentDate );
@@ -221,7 +252,60 @@ class TimeTableController {
         }
         return jsonObject.toString ( );
     }
+    @PostMapping ( value = "/DeleteReservation", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+    String deleteReservation(Long sportobjectid,String startReservationToDelete,String endReservationToDelete){
+        String useremial=userAuth ();
+        User user=userRepository.findByEmail ( useremial );
+        Date startToDelete=pasreDate ( startReservationToDelete ).toDate ();
+        Date endToDelete=pasreDate ( endReservationToDelete ).toDate ();
 
+        TimeTable timeTableToDelete=timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid (startToDelete,endToDelete,sportobjectid );
+        if(timeTableToDelete!=null){
+            if(startToDelete.before (  new Date (  ) )){
+                return  new JSONObject (  ).put ( "messsage","Erorr_Check_The_Correctness" ).toString ();
+            }else{
+                if(user.getId ()!=timeTableToDelete.getRenterid ()){
+
+                    return  new JSONObject (  ).put ( "message" ,"SERVER_ERROR").toString ();
+                }else{
+                        deleteReserv ( timeTableToDelete,user );
+                    return  new JSONObject (  ).put ( "message","Delete_Success" ).toString ();
+
+                }
+
+
+            }
+
+
+
+
+        }else{
+            return  new JSONObject (  ).put ( "messsage","Erorr_Check_The_Correctness" ).toString ();
+
+        }
+
+
+    }
+    private  void deleteReserv( TimeTable timeTableToDelete, User user ){
+
+        SportObject sportObject = sportObjectReposiotry.getOne ( timeTableToDelete.getSportobjectid ( ) );
+        PaymentHisotry paymentHisotry = paymentHistoryRepository.findBySportobjectidAndAndStartrentAndExprrent ( timeTableToDelete.getSportobjectid () , timeTableToDelete.getStartrent () , timeTableToDelete.getEndrend () );
+        // System.out.println (oldPostStartRentDate);
+
+        //delete old reserv
+        sportObject.getTimeTable ( ).remove ( timeTableToDelete );
+        sportObject.getPaymentHisotries ( ).remove ( paymentHisotry );
+        user.getPaymentHisotries ( ).remove ( paymentHisotry );
+
+
+        userRepository.save ( user );
+        sportObjectReposiotry.save ( sportObject );
+
+        paymentHistoryRepository.delete ( paymentHisotry );
+        timeTableReposiotry.delete ( timeTableToDelete );
+
+    }
 
     private
     DateTime pasreDate ( String date ) {
@@ -277,19 +361,8 @@ class TimeTableController {
                     break;
                 }
             }
-        } else{
-
-
-//           for (TimeTable item : timeTableList) {
-//               System.out.println ("tutaj1" );
-//               if ( item.getStartrent ( ).getTime ( ) == postStartRentDate.getTime ( ) || ( postStartRentDate.getTime ( ) >= item.getStartrent ( ).getTime ( ) && postStartRentDate.getTime ( ) < item.getEndrend ( ).getTime ( ) ) ) {
-//
-//                   isFree = false;
-//                    break;
-//               }
-//
-//           }
-//       }
+        }
+        else{
 
             if ( timeTableList.get ( 0 ).getStartrent ( ).getTime ( ) == postStartRentDate.getTime ( ) ||
                     ( postStartRentDate.getTime ( ) >= timeTableList.get ( 0 ).getStartrent ( ).getTime ( ) && postStartRentDate.getTime ( ) < timeTableList.get ( 0 ).getEndrend ( ).getTime ( ) ) ) {
@@ -300,5 +373,25 @@ class TimeTableController {
 
         }
         return isFree;
+    }
+    public  int getHourCount(Date start,Date end){
+        double startHour = hourToDobule (  start);
+        double endHour = hourToDobule ( end );
+        int hoursCount = (int) ((endHour - startHour) * 2);
+        return  hoursCount;
+
+    }
+    public
+    double  hourToDobule(Date date){
+        double hour= date.getHours ();
+        double minutes=date.getMinutes ();
+        if (minutes==0) {
+            minutes = 0;
+        } else {
+            minutes =0.5;
+        }
+        System.out.println (hour );
+        return  hour+minutes;
+
     }
 }

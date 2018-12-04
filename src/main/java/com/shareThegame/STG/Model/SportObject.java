@@ -2,11 +2,14 @@ package com.shareThegame.STG.Model;
 
 import com.shareThegame.STG.Repository.TimeTableReposiotry;
 import org.hibernate.annotations.LazyToOne;
+import org.joda.time.DateTime;
 import org.json.JSONPropertyIgnore;
 
 import javax.persistence.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -18,7 +21,6 @@ public class SportObject {
 
     private String city;
 
-    private  String adress;
 
     private String street;
 
@@ -30,7 +32,7 @@ public class SportObject {
 
     private int active;
 
-    private int rentprice;
+    private double rentprice;
 
     private  Long ownid;
 
@@ -52,12 +54,23 @@ public class SportObject {
 
     private  boolean badminton;
 
+    private  String zipcodecity;
+
+    private String siteadress;
+
+
+
+    private String email;
 
     private  String phoneno;
 
     private  String open;
 
     private  String close;
+
+    private double latitude;
+
+    private double  longitude;
 
 
     @OneToMany
@@ -109,13 +122,6 @@ public class SportObject {
         this.city = city;
     }
 
-    public String getAdress() {
-        return adress;
-    }
-
-    public void setAdress(String adress) {
-        this.adress = adress;
-    }
 
     public String getStreet() {
         return street;
@@ -157,11 +163,11 @@ public class SportObject {
         this.active = active;
     }
 
-    public int getRentprice() {
+    public double getRentprice() {
         return rentprice;
     }
 
-    public void setRentprice(int rentprice) {
+    public void setRentprice(double rentprice) {
         this.rentprice = rentprice;
     }
 
@@ -349,4 +355,93 @@ public class SportObject {
     void setClose ( String close ) {
         this.close = close;
     }
+
+    public
+    String getEmail ( ) {
+        return email;
+    }
+
+    public
+    void setEmail ( String email ) {
+        this.email = email;
+    }
+    public
+    double getLatitude ( ) {
+        return latitude;
+    }
+
+    public
+    void setLatitude ( double latitude ) {
+        this.latitude = latitude;
+    }
+
+    public
+    double getLongitude ( ) {
+        return longitude;
+    }
+
+    public
+    void setLongitude ( double longitude ) {
+        this.longitude = longitude;
+    }
+
+    public
+    String getZipcodecity ( ) {
+        return zipcodecity;
+    }
+
+    public
+    void setZipcodecity ( String zipcodecity ) {
+        this.zipcodecity = zipcodecity;
+    }
+
+    public
+    String getSiteadress ( ) {
+        return siteadress;
+    }
+
+    public
+    void setSiteadress ( String siteadress ) {
+        this.siteadress = siteadress;
+    }
+
+    public  int calc(){
+        double startHour = hourToDouble(open);
+        double endHour = hourToDouble(close);
+        int hoursCount = (int) ((endHour - startHour) * 2);
+        return  hoursCount;
+
+    }
+    public double hourToDouble(String hour) {
+        String hours, minutes;
+        hours = hour.substring(0, 2);
+        minutes = hour.substring(3, 5);
+
+        double dHour;
+        double dMinutes;
+
+        dHour = Double.parseDouble(hours);
+        if (minutes.equals("00")) {
+            dMinutes = 0.0;
+        } else {
+            dMinutes = 0.5;
+        }
+
+        return dHour + dMinutes;
+    }
+    public
+    Date getDate(String day){
+        int hour= Integer.parseInt (  day.substring ( 0 , 2)) ;
+        String min=day.substring( 3,5 );
+        int minutes;
+        if (min.equals("00")) {
+            minutes = 0;
+        } else {
+            minutes =30;
+        }
+     //   System.out.println (hour );
+        return  new DateTime ( 2000,1,1,hour,minutes,0).toDate ();
+
+    }
+
 }

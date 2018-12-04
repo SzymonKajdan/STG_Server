@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-public class User {
+public
+class User {
     @Id
     @GeneratedValue ( strategy = GenerationType.IDENTITY )
     private long id;
@@ -27,9 +28,9 @@ public class User {
 
     private String firstname;
 
-    private  String lastname;
+    private String lastname;
 
-    private  String paypalemail;
+    private String paypalemail;
 
     private Date dateofbirth;
 
@@ -39,73 +40,87 @@ public class User {
 
     @ManyToMany
     @JoinTable ( name = "user_role", joinColumns = @JoinColumn ( name = "user_id" ), inverseJoinColumns = @JoinColumn ( name = "role_id" ) )
-    private List<Role> roles;
+    private List <Role> roles;
 
     @OneToMany
-    private  List<SportObject> sportObjects;
+    private List <SportObject> sportObjects;
 
-    @NotFound (action = NotFoundAction.IGNORE)
+    @NotFound ( action = NotFoundAction.IGNORE )
     @OneToMany
-    private  List<PaymentHisotry>paymentHisotries;
+    private List <PaymentHisotry> paymentHisotries;
 
 
     @OneToMany
-    List<FavouriteObjects> favouriteObjects;
+    private List <FavouriteObjects> favouriteObjects;
 
 
-    public long getId( ) {
+    public
+    long getId ( ) {
         return id;
     }
 
-    public void setId( int id ) {
+    public
+    void setId ( int id ) {
         this.id = id;
     }
 
-    public String getEmail( ) {
+    public
+    String getEmail ( ) {
         return email;
     }
 
-    public void setEmail( String email ) {
+    public
+    void setEmail ( String email ) {
         this.email = email;
     }
 
-    public String getUsername( ) {
+    public
+    String getUsername ( ) {
         return username;
     }
 
-    public void setUsername( String username ) {
+    public
+    void setUsername ( String username ) {
         this.username = username;
     }
 
-    public String getPassword( ) {
+    public
+    String getPassword ( ) {
         return password;
     }
 
-    public void setPassword( String password ) {
+    public
+    void setPassword ( String password ) {
         this.password = password;
     }
 
-    public String getPhoneno( ) {
+    public
+    String getPhoneno ( ) {
         return phoneno;
     }
 
-    public void setPhoneno( String phoneno ) {
+    public
+    void setPhoneno ( String phoneno ) {
         this.phoneno = phoneno;
     }
 
-    public List <Role> getRoles( ) {
+    public
+    List <Role> getRoles ( ) {
         return roles;
     }
 
-    public void setRoles( List <Role> roles ) {
+    public
+    void setRoles ( List <Role> roles ) {
         this.roles = roles;
     }
 
-    public int getActive( ) {
+    public
+    int getActive ( ) {
         return active;
     }
 
-    public void setActive( int active ) {
+    public
+    void setActive ( int active ) {
         this.active = active;
     }
 
@@ -138,7 +153,7 @@ public class User {
 
     public
     String getPhoto ( ) {
-        return Base64.getEncoder().encodeToString(photo);
+        return Base64.getEncoder ( ).encodeToString ( photo );
     }
 
     public

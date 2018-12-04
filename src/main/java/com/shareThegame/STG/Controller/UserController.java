@@ -1,24 +1,17 @@
 package com.shareThegame.STG.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
 import com.shareThegame.STG.Service.UserService;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +37,7 @@ public class UserController {
     VisvilityObjectRepository visvilityObjectRepository;
     @Autowired
     private
-    ObejctExstrasRepository obejctExstrasRepository;
+    ObjectExstrasRepository objectExstrasRepository;
     @Autowired
     private
     ObjectPhotosRepository objectPhotosRepository;
@@ -105,6 +98,7 @@ public class UserController {
             if ( userExist != null ) {
                 if ( userService.comaprePassword ( userExist.getPassword ( ) , user.getPassword ( ) ) == true ) {
                     jsonObject.put ( "message" , "SUCCESS" );
+                    jsonObject.put ( "userId",userExist.getId () );
                 } else {
                     jsonObject.put ( "message" , "WRONG_PASSWORD_OR_USERNAME" );
                 }
@@ -241,56 +235,99 @@ public class UserController {
 
             List <FavouriteObjects> favouriteObjectsListToDelete = userToDelete.getFavouriteObjects ( );
 
-            //System.out.println (sportObjectsToDelete.size () );
-            for (SportObject item : sportObjectsToDelete) {
+            if(sportObjectsToDelete.size ()!=0) {
+                //System.out.println (sportObjectsToDelete.size () );
+                for (SportObject item : sportObjectsToDelete) {
 
 
-                List <TimeTable> timeTableListToDelete = timeTableReposiotry.findAllBySportobjectid ( item.getId ( ) );
-                item.getTimeTable ( ).removeAll ( timeTableListToDelete );
-                timeTableReposiotry.deleteAll ( timeTableListToDelete );
+                    List <TimeTable> timeTableListToDelete = timeTableReposiotry.findAllBySportobjectid ( item.getId ( ) );
+                    if(timeTableListToDelete.size ()!=0) {
+                        item.getTimeTable ( ).removeAll ( timeTableListToDelete );
+                        timeTableReposiotry.deleteAll ( timeTableListToDelete );
+                    }
+                    VisibilityObject visibilityObjectToDelete = visvilityObjectRepository.findBySportobjectid ( item.getId ( ) );
+                   if(visibilityObjectToDelete!=null) {
+                       item.setVisibilityObject ( null );
+                       visvilityObjectRepository.delete ( visibilityObjectToDelete );
+                   }
 
-                VisibilityObject visibilityObjectToDelete = visvilityObjectRepository.findBySportobjectid ( item.getId ( ) );
-                item.setVisibilityObject ( null );
-                visvilityObjectRepository.delete ( visibilityObjectToDelete );
+                    ObjectExtras objectExtras = objectExstrasRepository.findBySportobjectid ( item.getId ( ) );
+                   if(objectExtras!=null) {
+                       item.setObjectExtras ( null );
+                       objectExstrasRepository.delete ( objectExtras );
+                   }
+                    List <ObjectPhotos> objectPhotosListToDelete = objectPhotosRepository.findAllBySportobjectid ( item.getId ( ) );
+                   if(objectPhotosListToDelete.size ()!=0) {
+                       item.getObjectPhotos ( ).removeAll ( objectPhotosListToDelete );
+                       objectPhotosRepository.deleteAll ( objectPhotosListToDelete );
+                   }
+                    List <PaymentHisotry> paymentHisotryListToDelete = paymentHistoryRepository.findAllBySportObject ( item );
+                    List <PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllByUser ( userToDelete );
+                    if(paymentHisotryListToDelete.size ()!=0) {
+
+                        item.getPaymentHisotries ( ).removeAll ( paymentHisotryListToDelete );
+
+                    }
+                    if(paymentHisotryList.size ()!=0){
+                        item.getPaymentHisotries ( ).removeAll ( paymentHisotryList );
+
+                            for(PaymentHisotry p:paymentHisotryList){
+
+                                p.setUser ( null );
+                            }
+                    }
 
 
-                ObjectExtras objectExtras = obejctExstrasRepository.findBySportobjectid ( item.getId ( ) );
-                item.setObjectExtras ( null );
-                obejctExstrasRepository.delete ( objectExtras );
-
-                List <ObjectPhotos> objectPhotosListToDelete = objectPhotosRepository.findAllBySportobjectid ( item.getId ( ) );
-                item.getObjectPhotos ( ).removeAll ( objectPhotosListToDelete );
-                objectPhotosRepository.deleteAll ( objectPhotosListToDelete );
-
-                List <PaymentHisotry> paymentHisotryListToDelete = paymentHistoryRepository.findAllBySportObject ( item );
-                List <PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllByUser ( userToDelete );
-                item.getPaymentHisotries ( ).removeAll ( paymentHisotryList );
-                item.getPaymentHisotries ( ).removeAll ( paymentHisotryListToDelete );
+                    List <ObjectStars> objectStarsListToDelete = objectStarsRepository.findAllBySportobjectid ( item.getId ( ) );
+                    if(objectStarsListToDelete.size ()!=0) {
+                        item.getObjectStars ( ).removeAll ( objectStarsListToDelete );
+                        objectStarsRepository.deleteAll ( objectStarsListToDelete );
+                    }
+                    item.setUser ( null );
+                }
+                userToDelete.getSportObjects ( ).removeAll ( sportObjectsToDelete );
+            }
+            else{
 
 
-                List <ObjectStars> objectStarsListToDelete = objectStarsRepository.findAllBySportobjectid ( item.getId ( ) );
-                item.getObjectStars ( ).removeAll ( objectStarsListToDelete );
-                objectStarsRepository.deleteAll ( objectStarsListToDelete );
-
-                item.setUser ( null );
             }
 
-            userToDelete.getFavouriteObjects ( ).removeAll ( favouriteObjectsListToDelete );
+            if(favouriteObjectsListToDelete.size ()!=0){
+                userToDelete.getFavouriteObjects ( ).removeAll ( favouriteObjectsListToDelete );
+                for(FavouriteObjects p:favouriteObjectsListToDelete){
 
+                    p.setUser ( null );
+                }
 
-            userToDelete.getSportObjects ( ).removeAll ( sportObjectsToDelete );
+                favouriteObjectsRepository.deleteAll ( favouriteObjectsRepository.findByUserid ( userToDelete.getId ( ) ) );
+            }
+
+            List <PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllByUser ( userToDelete );
+            if(paymentHisotryList.size ()!=0){
+                for(PaymentHisotry p:paymentHisotryList){
+
+                    p.setUser ( null );
+                }
+
+                paymentHisotryList.removeAll ( paymentHistoryRepository.findAllByUser ( userToDelete ) );
+                paymentHistoryRepository.deleteAll ( paymentHisotryList );
+
+            }
+
 
             // userToDelete.getPaymentHisotries ().removeAll (  )
-
-            favouriteObjectsRepository.deleteAll ( favouriteObjectsRepository.findByUserid ( userToDelete.getId ( ) ) );
+           // userToDelete.setPaymentHisotries (null);
 
 
             userRepository.delete ( userToDelete );
-            sportObjectReposiotry.deleteAll ( sportObjectReposiotry.findAllByOwnid ( userToDelete.getId ( ) ) );
-            for (SportObject item : sportObjectsToDelete)
-                paymentHistoryRepository.deleteAll ( paymentHistoryRepository.findAllBySportobjectid ( item.getId ( ) ) );
-            //paymentHistoryRepository.deleteAll (paymentHistoryRepository.fin);
-            return true;
+
+                sportObjectReposiotry.deleteAll ( sportObjectReposiotry.findAllByOwnid ( userToDelete.getId ( ) ) );
+                for (SportObject item : sportObjectsToDelete)
+                    paymentHistoryRepository.deleteAll ( paymentHistoryRepository.findAllBySportobjectid ( item.getId ( ) ) );
+                //paymentHistoryRepository.deleteAll (paymentHistoryRepository.fin);
+                return true;
+
+
         } else {
             return false;
         }

@@ -4,7 +4,6 @@ package com.shareThegame.STG.Service;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
 import org.joda.time.DateTime;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,13 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StreamUtils;
 
 import javax.annotation.PostConstruct;
-import javax.validation.Valid;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 @Service
 public
@@ -39,7 +34,7 @@ class UserServiceTest {
     @Autowired
     private VisvilityObjectRepository visvilityObjectRepository;
     @Autowired
-    private ObejctExstrasRepository obejctExstrasRepository;
+    private ObjectExstrasRepository objectExstrasRepository;
     @Autowired
     private ObjectPhotosRepository objectPhotosRepository;
     @Autowired
@@ -61,7 +56,6 @@ class UserServiceTest {
 
 
         sportObject.setActive ( 1 );
-        sportObject.setAdress ( "Ignacego Skorupki 21, 90-001 Łódź" );
         sportObject.setCity ( "Lodz" );
         sportObject.setLocalno ( "21" );
         sportObject.setOwnid ( ( ( long ) 1 ) );
@@ -97,15 +91,15 @@ class UserServiceTest {
         favouriteObject.setSportobjectid ( (long) 1 );
         favouriteObject.setUserid ( (long)1 );
         if(favouriteObjectsRepository.findByUserid (( long) 1 ).size ()==0){
-        favouriteObjectsRepository.save ( favouriteObject );
+            favouriteObjectsRepository.save ( favouriteObject );
         }
 //terminarz dla hali nr 1
         TimeTable timeTable = new TimeTable ( );
         timeTable.setPrice ( ( long ) 100 );
         timeTable.setPaymenttype ( "pp" );
         timeTable.setRenterid ( ( long ) 1 );
-        Date start = new DateTime ( 2018 , 11 , 20, 18 , 00  ).toDate ( );
-        Date end = new DateTime ( 2018 , 11 , 20 , 19 , 00 ).toDate ( );
+        Date start = new DateTime ( 2018 , 12 , 20, 18 , 00  ).toDate ( );
+        Date end = new DateTime ( 2018 , 12 , 20 , 19 , 00 ).toDate ( );
 
         timeTable.setStartrent ( start );
         timeTable.setEndrend ( end );
@@ -134,8 +128,8 @@ class UserServiceTest {
         objectExtras.setArtificiallighting ( true );
         objectExtras.setToilets ( true );
         objectExtras.setSportobjectid ( ( long ) 1 );
-        if ( obejctExstrasRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
-            obejctExstrasRepository.save ( objectExtras );
+        if ( objectExstrasRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
+            objectExstrasRepository.save ( objectExtras );
 
 
         }
@@ -145,7 +139,7 @@ class UserServiceTest {
         objectPhoto.setSportobjectid ( ( long ) 1 );
 
         byte[] fileContent = null;
-       try {
+        try {
             ClassPathResource imgFile = new ClassPathResource ( "img/2.jpg" );
             fileContent = StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) );
         } catch ( IOException e ) {
@@ -157,15 +151,16 @@ class UserServiceTest {
             objectPhotosRepository.save ( objectPhoto );
         }
 //hisotria paltnosci za hale
-        PaymentHisotry paymentHisotry = new PaymentHisotry ( );
-        paymentHisotry.setCost ( 100 );
-        paymentHisotry.setUserid ( ( long ) 1 );
-        paymentHisotry.setSportobjectid ( ( long ) 1 );
-        paymentHisotry.setStautsofpayment ( true );
-        paymentHisotry.setExprrent ( new DateTime ( 2018 , 11 , 20 , 19 , 00 ).toDate ( ) );
-        paymentHisotry.setStartrent ( new DateTime ( 2018 , 11 , 20 , 18 , 00 ).toDate ( ) );
 
-        if ( paymentHistoryRepository.findAll ().size () == 0 ) {
+        PaymentHisotry paymentHisotry = new PaymentHisotry ( );
+        if ( paymentHistoryRepository.findAllBySportobjectid ((long) 1).size () == 0 ) {
+
+            paymentHisotry.setCost ( 100 );
+            paymentHisotry.setUserid ( ( long ) 1 );
+            paymentHisotry.setSportobjectid ( ( long ) 1 );
+            paymentHisotry.setStautsofpayment ( true );
+            paymentHisotry.setExprrent ( new DateTime ( 2018 , 12 , 20 , 19 , 00 ).toDate ( ) );
+            paymentHisotry.setStartrent ( new DateTime ( 2018 , 12 , 20 , 18 , 00 ).toDate ( ) );
             paymentHistoryRepository.save ( paymentHisotry );
         }
 
@@ -178,7 +173,7 @@ class UserServiceTest {
             sportObject.getPaymentHisotries ( ).add ( paymentHisotry );
             sportObject.getObjectStars ( ).add ( objectStars );
             sportObject.setOpen ( "06:00" );
-            sportObject.setClose ( "18:00" );
+            sportObject.setClose ( "20:00" );
 
             System.out.println ( "pierwsza hala dodana" );
             sportObjectReposiotry.save ( sportObject );
@@ -200,28 +195,29 @@ class UserServiceTest {
             System.out.println ( "stworzylem role " );
         }
 
-        User test = new User ( );
-        test.setPassword ( "admin" );
-        test.setUsername ( "admin" );
-        test.setEmail ( "22321@dsaas.co" );
-        test.setActive ( 1 );
-        test.setPhoneno ( "790 540 834" );
-        test.setLastname ( "Kajdan" );
-        test.setFirstname ( "Szymon" );
-        test.setDateofbirth ( new DateTime (   1996,11,03 ,0,0,0).toDate ());
-        test.setSportObjects ( new ArrayList <> ( ) );
-        test.getSportObjects ( ).add ( sportObject );
-        test.setFavouriteObjects ( new ArrayList <> (  ) );
-        test.getFavouriteObjects ().add ( favouriteObject );
+
 
 
 
         if ( userRepository.findByUsername ( "admin" ) == null ) {
+            User test = new User ( );
+            test.setPassword ( "admin" );
+            test.setUsername ( "admin" );
+            test.setEmail ( "22321@dsaas.co" );
+            test.setActive ( 1 );
+            test.setPhoneno ( "790 540 834" );
+            test.setLastname ( "Kajdan" );
+            test.setFirstname ( "Szymon" );
+            test.setDateofbirth ( new DateTime (   1996,11,03 ,0,0,0).toDate ());
+            test.setSportObjects ( new ArrayList <> ( ) );
+            test.getSportObjects ( ).add ( sportObject );
+            test.setFavouriteObjects ( new ArrayList <> (  ) );
+            test.getFavouriteObjects ().add ( favouriteObject );
 
             System.out.println ( "inializuje uytkonikow" );
             test.setPaymentHisotries ( new ArrayList <> ( ) );
             test.getPaymentHisotries ( ).add ( paymentHisotry );
-          //  test.getFavouriteObjects ().add ( favouriteObject );
+            //  test.getFavouriteObjects ().add ( favouriteObject );
 
 
             userService.saveUser ( test );

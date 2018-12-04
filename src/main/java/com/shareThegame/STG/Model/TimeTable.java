@@ -2,6 +2,7 @@ package com.shareThegame.STG.Model;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 public
@@ -99,4 +100,6 @@ class TimeTable implements  Comparable<TimeTable> {
         }
         return getStartrent ().compareTo(o.getStartrent ());
     }
+
+
 }

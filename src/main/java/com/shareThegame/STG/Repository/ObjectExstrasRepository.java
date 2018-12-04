@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ObejctExstrasRepository extends JpaRepository<ObjectExtras,Long> {
+public interface ObjectExstrasRepository extends JpaRepository<ObjectExtras,Long> {
     ObjectExtras findBySportobjectid(Long sportobjectid);
 }
