@@ -66,10 +66,10 @@ class UserServiceTest {
         sportObject.setOwnid ( ( long ) 1 );
         sportObject.setActive ( 1 );
         sportObject.setBadminton ( true );
-        sportObject.setVolleball ( true );
+        sportObject.setVolleyball ( true );
         sportObject.setHandball ( false );
         sportObject.setSoccer ( false );
-        sportObject.setFustal ( true );
+        sportObject.setFutsal ( true );
         sportObject.setBasketball ( true );
         sportObject.setSquash ( false );
         sportObject.setTimeTable ( new ArrayList <> ( ) );
@@ -203,12 +203,12 @@ class UserServiceTest {
             User test = new User ( );
             test.setPassword ( "admin" );
             test.setUsername ( "admin" );
-            test.setEmail ( "22321@dsaas.co" );
+            test.setEmail ( "szymonkajdan@gmail.com" );
             test.setActive ( 1 );
             test.setPhoneno ( "790 540 834" );
             test.setLastname ( "Kajdan" );
             test.setFirstname ( "Szymon" );
-            test.setDateofbirth ( new DateTime (   1996,11,03 ,0,0,0).toDate ());
+            test.setDateofbirth ( "03/28/1996");
             test.setSportObjects ( new ArrayList <> ( ) );
             test.getSportObjects ( ).add ( sportObject );
             test.setFavouriteObjects ( new ArrayList <> (  ) );

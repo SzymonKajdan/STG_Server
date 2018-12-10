@@ -38,9 +38,9 @@ public class SportObject {
 
     private  String name;
 
-    private boolean fustal;
+    private boolean futsal;
 
-    private  boolean volleball;
+    private  boolean volleyball;
 
     private boolean  soccer;
 
@@ -56,9 +56,7 @@ public class SportObject {
 
     private  String zipcodecity;
 
-    private String siteadress;
-
-
+    private String siteaddress;
 
     private String email;
 
@@ -246,23 +244,24 @@ public class SportObject {
     }
 
     public
-    boolean isFustal ( ) {
-        return fustal;
+    boolean isFutsal ( ) {
+        return futsal;
     }
 
     public
-    void setFustal ( boolean fustal ) {
-        this.fustal = fustal;
+    void setFutsal ( boolean futsal ) {
+        this.futsal = futsal;
+    }
+
+
+    public
+    boolean isVolleyball ( ) {
+        return volleyball;
     }
 
     public
-    boolean isVolleball ( ) {
-        return volleball;
-    }
-
-    public
-    void setVolleball ( boolean volleball ) {
-        this.volleball = volleball;
+    void setVolleyball ( boolean volleyball ) {
+        this.volleyball = volleyball;
     }
 
     public
@@ -396,13 +395,13 @@ public class SportObject {
     }
 
     public
-    String getSiteadress ( ) {
-        return siteadress;
+    String getSiteaddress ( ) {
+        return siteaddress;
     }
 
     public
-    void setSiteadress ( String siteadress ) {
-        this.siteadress = siteadress;
+    void setSiteaddress ( String siteaddress ) {
+        this.siteaddress = siteaddress;
     }
 
     public  int calc(){

@@ -66,6 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/client/**").hasAnyAuthority("CLIENT").and ().httpBasic ();
         //user
         http.authorizeRequests().antMatchers("/register").permitAll ();
+        http.authorizeRequests().antMatchers("/rememberPassword").permitAll ();
         http.authorizeRequests().antMatchers("/login").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/resetPassword").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/updateProfile").hasAnyAuthority("CLIENT").and ().httpBasic ();

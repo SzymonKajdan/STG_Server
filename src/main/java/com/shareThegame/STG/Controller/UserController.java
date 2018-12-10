@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class UserController {
@@ -146,30 +148,81 @@ public class UserController {
     @PostMapping ( value = "/getUser", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )@ResponseBody
     public
     String giveBackUser(  ) throws JSONException, JsonProcessingException {
+        System.out.println (" zwracam usera" );
+        String usermail=userAuth ();
+        User user=userRepository.findByEmail ( usermail );
+        Map<String,Object> userMap = new HashMap<> ();
+        JSONObject jsonObject=new JSONObject (  );
+        if ( user != null ) {
+            if(user.getUsername ()!=null) {
+                jsonObject.put ( "username" , user.getUsername ( ) );
+            }
+            else {
+                jsonObject.put ( "username" , "" );
+            }
+            if(user.getEmail ()!=null) {
+                jsonObject.put ( "email" , user.getEmail ( ) );
+            }
+            else{
+                jsonObject.put ( "email","" );
+            }
+            if ( user.getPhoneno ()!=null ) {
+                jsonObject.put ( "phoneno" , user.getPhoneno ( ) );
+            }
+            else{
+                jsonObject.put ( "phoneno" , "" );
+            }
+            if(user.getFirstname ()!=null) {
+                jsonObject.put ( "firstname" , user.getFirstname ( ) );
+            }
+            else{
+                jsonObject.put ( "firstname","" );
+            }
+            if( user.getLastname ()!=null){
+                jsonObject.put ( "lastname",user.getLastname () );
+            }
+            else{
+                jsonObject.put ( "lastname","" );
+            }
 
-        String useremail=userAuth ();
-        List <User> list = new ArrayList <> ( );
-        System.out.println (useremail );
-        User usertoGive = userRepository.findByEmail ( useremail );
-        list.add ( usertoGive );
-        JSONObject jsonObject = new JSONObject (usertoGive );
+            if(user.getPaypalemail ()!=null) {
+                jsonObject.put ( "paypalemail" , user.getPaypalemail ( ) );
+            }else{
+                jsonObject.put ( "paypalemail" , "" );
 
-         return  jsonObject.toString ();
+            }
+            if(user.getDateofbirth ()!=null){
+                jsonObject.put ( "dateofbirth",user.getDateofbirth ());
+
+            }else{
+                jsonObject.put ( "dateofbirth","");
+            }
+
+
+        }
+        System.out.println (" zwracam usera"+jsonObject.toString () );
+        return jsonObject.toString ();
+
+
+
+
     }
     @PostMapping ( value = "/updateProfile", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
-    String updateProfile(@Valid User user,String dateOfbirth){
+    String updateProfile(@Valid User user){
         String useremail=userAuth ();
         User userToUpdate=userRepository.findByEmail ( useremail );
         if(userToUpdate!=null) {
-            userToUpdate.setDateofbirth ( parseDateOfBirth ( dateOfbirth ).toDate ( ) );
+            System.out.println (user.getDateofbirth () );
+            userToUpdate.setDateofbirth ( user.getDateofbirth ());
             userToUpdate.setEmail ( user.getEmail ( ) );
             userToUpdate.setPaypalemail ( user.getPaypalemail ( ) );
             userToUpdate.setFirstname ( user.getFirstname ( ) );
             userToUpdate.setLastname ( user.getLastname ( ) );
             userToUpdate.setPhoneno ( user.getPhoneno ( ) );
+            userToUpdate.setUsername ( user.getUsername () );
 //        toUpdate.setPhoto (  Base64.decodeBase64(user.getPhoto ()) );
-            userService.saveUser ( userToUpdate );
+            userRepository.save ( userToUpdate );
 
         return new JSONObject ( ).put ( "message","UPDATE_SUCCESS" ).toString ();
         }
@@ -177,6 +230,8 @@ public class UserController {
             return new JSONObject ( ).put ( "message","UPDATE_ERROR" ).toString ();
         }
     }
+
+
     @PostMapping(value = "/deleteUser",produces = "application/json",consumes =  "application/x-www-form-urlencoded;charset=UTF-8")
     public @ResponseBody
     String deleteUser(@Valid User user){
@@ -193,6 +248,7 @@ public class UserController {
         }
 
     }
+
 
     private String userAuth(){
 

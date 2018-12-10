@@ -32,7 +32,7 @@ class User {
 
     private String paypalemail;
 
-    private Date dateofbirth;
+    private String dateofbirth;
 
     private int active;
 
@@ -192,12 +192,12 @@ class User {
     }
 
     public
-    Date getDateofbirth ( ) {
+    String getDateofbirth ( ) {
         return dateofbirth;
     }
 
     public
-    void setDateofbirth ( Date dateofbirth ) {
+    void setDateofbirth ( String dateofbirth ) {
         this.dateofbirth = dateofbirth;
     }
 

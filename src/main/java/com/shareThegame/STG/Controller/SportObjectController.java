@@ -72,8 +72,8 @@ class SportObjectController {
             sportObjectMap.put ( "rentprice",item.getRentprice () );
             sportObjectMap.put ( "ownid",item.getOwnid () );
             sportObjectMap.put ( "name",item.getName () );
-            sportObjectMap.put ( "fustal",item.isFustal () );
-            sportObjectMap.put ( "volleball",item.isVolleball () );
+            sportObjectMap.put ( "fustal",item.isFutsal () );
+            sportObjectMap.put ( "volleball",item.isVolleyball () );
             sportObjectMap.put ( "soccer",item.isSoccer () );
             sportObjectMap.put ( "tennis",item.isTennis () );
             sportObjectMap.put ( "squash",item.isSquash () );
@@ -81,7 +81,7 @@ class SportObjectController {
             sportObjectMap.put ( "basketball",item.isBasketball () );
             sportObjectMap.put ( "badminton",item.isBadminton () );
             sportObjectMap.put ( "zipcodecity",item.getZipcode () );
-            sportObjectMap.put ( "siteadress",item.getSiteadress () );
+            sportObjectMap.put ( "siteadress",item.getSiteaddress () );
             sportObjectMap.put ( "email",item.getEmail () );
             sportObjectMap.put ( "phoneno",item.getPhoneno () );
             sportObjectMap.put ( "open",item.getOpen () );
@@ -118,6 +118,8 @@ class SportObjectController {
         sportObject.setObjectStars ( new ArrayList <> (  ) );
         sportObject.setOwnid ( user.getId () );
         sportObject.setActive ( 1 );
+        sportObject.setUser ( user );
+        user.getSportObjects ().add ( sportObject );
         JSONObject jsonObject = new JSONObject ( );
 
         if(user!=null) {
@@ -125,13 +127,14 @@ class SportObjectController {
 
             sportObject.setOwnid ( user.getId ( ) );
             sportObjectReposiotry.save ( sportObject );
+            userRepository.save ( user );
 
 
-            jsonObject.put ( "satus" , "dodano" );
+            jsonObject.put ( "message" , "SUCCESS" );
         }
         else{
 
-            jsonObject.put ( "satus" , "nie dodano" );
+            jsonObject.put ( "message" , "FAILED " );
         }
         return  jsonObject.toString ();
 
