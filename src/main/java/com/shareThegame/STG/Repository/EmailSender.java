@@ -1,4 +1,4 @@
-package com.shareThegame.STG.Interface;
+package com.shareThegame.STG.Repository;
 
 public
 interface EmailSender {

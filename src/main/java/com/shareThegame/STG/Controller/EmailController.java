@@ -1,6 +1,6 @@
 package com.shareThegame.STG.Controller;
 
-import com.shareThegame.STG.Interface.EmailSender;
+import com.shareThegame.STG.Repository.EmailSender;
 import com.shareThegame.STG.Model.User;
 import com.shareThegame.STG.Repository.UserRepository;
 import com.shareThegame.STG.Service.UserService;
@@ -9,12 +9,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import javax.validation.Valid;
 
 
 @Controller

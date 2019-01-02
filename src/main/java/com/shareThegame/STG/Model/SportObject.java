@@ -13,10 +13,11 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-public class SportObject {
+public
+class SportObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue ( strategy = GenerationType.IDENTITY )
     private Long id;
 
     private String city;
@@ -34,45 +35,45 @@ public class SportObject {
 
     private double rentprice;
 
-    private  Long ownid;
+    private Long ownid;
 
-    private  String name;
+    private String name;
 
     private boolean futsal;
 
-    private  boolean volleyball;
+    private boolean volleyball;
 
-    private boolean  soccer;
+    private boolean soccer;
 
-    private  boolean tennis;
+    private boolean tennis;
 
-    private  boolean squash ;
+    private boolean squash;
 
-    private  boolean handball;
+    private boolean handball;
 
-    private  boolean basketball;
+    private boolean basketball;
 
-    private  boolean badminton;
+    private boolean badminton;
 
-    private  String zipcodecity;
+    private String zipcodecity;
 
     private String siteaddress;
 
     private String email;
 
-    private  String phoneno;
+    private String phoneno;
 
-    private  String open;
+    private String open;
 
-    private  String close;
+    private String close;
 
     private double latitude;
 
-    private double  longitude;
+    private double longitude;
 
 
     @OneToMany
-    private List<TimeTable> timeTable;
+    private List <TimeTable> timeTable;
 
     @OneToOne
     private VisibilityObject visibilityObject;
@@ -81,13 +82,16 @@ public class SportObject {
     private ObjectExtras objectExtras;
 
     @OneToMany
-    private List<ObjectPhotos> objectPhotos;
+    private List <ObjectPhotos> objectPhotos;
 
     @OneToMany
-    private  List<PaymentHisotry> paymentHisotries;
+    private List <PaymentHisotry> paymentHisotries;
 
     @OneToMany
-    private  List<ObjectStars> objectStars;
+    private List <ObjectStars> objectStars;
+
+    @OneToOne
+    private OpenHours openHours;
 
     @JSONPropertyIgnore
     public
@@ -104,76 +108,94 @@ public class SportObject {
     private User user;
 
 
-    public Long getId() {
+    public
+    Long getId ( ) {
         return id;
     }
 
-    public void setId(Long id) {
+    public
+    void setId ( Long id ) {
         this.id = id;
     }
 
-    public String getCity() {
+    public
+    String getCity ( ) {
         return city;
     }
 
-    public void setCity(String city) {
+    public
+    void setCity ( String city ) {
         this.city = city;
     }
 
 
-    public String getStreet() {
+    public
+    String getStreet ( ) {
         return street;
     }
 
-    public void setStreet(String street) {
+    public
+    void setStreet ( String street ) {
         this.street = street;
     }
 
-    public String getLocalno() {
+    public
+    String getLocalno ( ) {
         return localno;
     }
 
-    public void setLocalno(String localno) {
+    public
+    void setLocalno ( String localno ) {
         this.localno = localno;
     }
 
-    public String getZipcode() {
+    public
+    String getZipcode ( ) {
         return zipcode;
     }
 
-    public void setZipcode(String zipcode) {
+    public
+    void setZipcode ( String zipcode ) {
         this.zipcode = zipcode;
     }
 
-    public String getPpmail() {
+    public
+    String getPpmail ( ) {
         return ppmail;
     }
 
-    public void setPpmail(String ppmail) {
+    public
+    void setPpmail ( String ppmail ) {
         this.ppmail = ppmail;
     }
 
-    public int getActive() {
+    public
+    int getActive ( ) {
         return active;
     }
 
-    public void setActive(int active) {
+    public
+    void setActive ( int active ) {
         this.active = active;
     }
 
-    public double getRentprice() {
+    public
+    double getRentprice ( ) {
         return rentprice;
     }
 
-    public void setRentprice(double rentprice) {
+    public
+    void setRentprice ( double rentprice ) {
         this.rentprice = rentprice;
     }
 
-    public Long getOwnid() {
+    public
+    Long getOwnid ( ) {
         return ownid;
     }
 
-    public void setOwnid(Long ownid) {
+    public
+    void setOwnid ( Long ownid ) {
         this.ownid = ownid;
     }
 
@@ -187,11 +209,13 @@ public class SportObject {
         this.timeTable = timeTable;
     }
 
-    public List<ObjectPhotos> getObjectPhotos() {
+    public
+    List <ObjectPhotos> getObjectPhotos ( ) {
         return objectPhotos;
     }
 
-    public void setObjectPhotos(List<ObjectPhotos> objectPhotos) {
+    public
+    void setObjectPhotos ( List <ObjectPhotos> objectPhotos ) {
         this.objectPhotos = objectPhotos;
     }
 
@@ -205,11 +229,13 @@ public class SportObject {
         this.visibilityObject = visibilityObject;
     }
 
-    public ObjectExtras getObjectExtras() {
+    public
+    ObjectExtras getObjectExtras ( ) {
         return objectExtras;
     }
 
-    public void setObjectExtras(ObjectExtras objectExtras) {
+    public
+    void setObjectExtras ( ObjectExtras objectExtras ) {
         this.objectExtras = objectExtras;
     }
 
@@ -364,6 +390,7 @@ public class SportObject {
     void setEmail ( String email ) {
         this.email = email;
     }
+
     public
     double getLatitude ( ) {
         return latitude;
@@ -404,42 +431,62 @@ public class SportObject {
         this.siteaddress = siteaddress;
     }
 
-    public  int calc(){
-        double startHour = hourToDouble(open);
-        double endHour = hourToDouble(close);
-        int hoursCount = (int) ((endHour - startHour) * 2);
-        return  hoursCount;
+    public
+    OpenHours getOpenHours ( ) {
+        return openHours;
+    }
+
+    public
+    void setOpenHours ( OpenHours openHours ) {
+        this.openHours = openHours;
+    }
+
+    public
+    int calc ( ) {
+        double startHour = hourToDouble ( open );
+        double endHour = hourToDouble ( close );
+        int hoursCount = ( int ) ( ( endHour - startHour ) * 2 );
+        return hoursCount;
 
     }
-    public double hourToDouble(String hour) {
+
+    public
+    double hourToDouble ( String hour ) {
         String hours, minutes;
-        hours = hour.substring(0, 2);
-        minutes = hour.substring(3, 5);
+        hours = hour.substring ( 0 , 2 );
+        minutes = hour.substring ( 3 , 5 );
 
         double dHour;
         double dMinutes;
 
-        dHour = Double.parseDouble(hours);
-        if (minutes.equals("00")) {
+        dHour = Double.parseDouble ( hours );
+        if ( minutes.equals ( "00" ) ) {
             dMinutes = 0.0;
-        } else {
+        }
+        else {
             dMinutes = 0.5;
         }
 
         return dHour + dMinutes;
     }
+
     public
-    Date getDate(String day){
-        int hour= Integer.parseInt (  day.substring ( 0 , 2)) ;
-        String min=day.substring( 3,5 );
+    Date getDate ( String day ) {
+        int hour = Integer.parseInt ( day.substring ( 0 , 2 ) );
+        String min = day.substring ( 3 , 5 );
         int minutes;
-        if (min.equals("00")) {
+        if ( min.equals ( "00" ) ) {
             minutes = 0;
-        } else {
-            minutes =30;
         }
-     //   System.out.println (hour );
-        return  new DateTime ( 2000,1,1,hour,minutes,0).toDate ();
+        else {
+            minutes = 30;
+        }
+        DateTime dt = new DateTime()
+                .withHourOfDay(hour)
+                .withMinuteOfHour(minutes)
+                .withSecondOfMinute(0).withMillisOfSecond ( 0 );
+        //   System.out.println (hour );
+        return dt.toDate ();
 
     }
 

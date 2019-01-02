@@ -13,13 +13,8 @@ public class VisibilityObject {
     private Long    sportobjectid;
 
 
-    @OneToOne
-    private  VisibilityObject visibilityObject;
 
-    public
-    void setVisibilityObject ( VisibilityObject visibilityObject ) {
-        this.visibilityObject = visibilityObject;
-    }
+
 
     public Long getId ( ) {
         return id;

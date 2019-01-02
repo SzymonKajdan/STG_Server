@@ -1,5 +1,6 @@
 package com.shareThegame.STG.Repository;
 
+import com.shareThegame.STG.Model.FavouriteObjects;
 import com.shareThegame.STG.Model.SportObject;
 import com.shareThegame.STG.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

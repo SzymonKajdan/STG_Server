@@ -72,6 +72,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/updateProfile").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/deleteUser").hasAnyAuthority("CLIENT").and ().httpBasic ();
 
+
         http.authorizeRequests().antMatchers("getObjecByCity").permitAll();
         http.authorizeRequests().antMatchers("getAllObjects").permitAll();
 
@@ -83,6 +84,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/DeleteReservation").hasAnyAuthority("CLIENT").and ().httpBasic ();
 
         http.authorizeRequests().antMatchers("/returnTimetableOfSportObject").permitAll();
+
+        http.authorizeRequests().antMatchers("/addObjectToFav").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        http.authorizeRequests().antMatchers("/getFavorites").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        http.authorizeRequests().antMatchers("/deleteFromFavorites").hasAnyAuthority("CLIENT").and ().httpBasic ();
 
         http.authorizeRequests ().antMatchers ( "/addMark" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 

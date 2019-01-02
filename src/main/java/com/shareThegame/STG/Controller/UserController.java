@@ -49,6 +49,9 @@ public class UserController {
     @Autowired
     private
     ObjectStarsRepository objectStarsRepository;
+    @Autowired
+    private
+    OpenHoursRepository openHoursRepository;
 
     @PostMapping ( value = "/register", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
@@ -145,8 +148,8 @@ public class UserController {
 
 
 
-    @PostMapping ( value = "/getUser", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )@ResponseBody
-    public
+    @PostMapping ( value = "/getUser", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @ResponseBody public
     String giveBackUser(  ) throws JSONException, JsonProcessingException {
         System.out.println (" zwracam usera" );
         String usermail=userAuth ();
@@ -305,6 +308,12 @@ public class UserController {
                    if(visibilityObjectToDelete!=null) {
                        item.setVisibilityObject ( null );
                        visvilityObjectRepository.delete ( visibilityObjectToDelete );
+                   }
+
+                   OpenHours openHours=openHoursRepository.findBySportobjectid ( item.getId () );
+                   if(openHours!=null){
+                       item.setOpenHours (null);
+                       openHoursRepository.delete ( openHours );
                    }
 
                     ObjectExtras objectExtras = objectExstrasRepository.findBySportobjectid ( item.getId ( ) );

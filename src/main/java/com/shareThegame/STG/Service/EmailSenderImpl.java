@@ -1,6 +1,6 @@
 package com.shareThegame.STG.Service;
 
-import com.shareThegame.STG.Interface.EmailSender;
+import com.shareThegame.STG.Repository.EmailSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

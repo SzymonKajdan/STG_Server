@@ -18,7 +18,7 @@ class FavouriteObjects {
 
     @ManyToOne
     User user;
-
+    
     public
     Long getId ( ) {
         return id;

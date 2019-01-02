@@ -45,6 +45,9 @@ class UserServiceTest {
     private ObjectStarsRepository objectStarsRepository;
     @Autowired
     private FavouriteObjectsRepository favouriteObjectsRepository;
+    @Autowired
+    private OpenHoursRepository openHoursRepository;
+
     @PostConstruct
     public
     void setUp ( ) {
@@ -60,6 +63,7 @@ class UserServiceTest {
         sportObject.setLocalno ( "21" );
         sportObject.setOwnid ( ( ( long ) 1 ) );
         sportObject.setPpmail ( "sportObject@stg.com" );
+        sportObject.setEmail ( "sportObject@stg.com" );
         sportObject.setPhoneno ( "42 636 77 88" );
         sportObject.setRentprice ( 100 );
         sportObject.setZipcode ( "90-001" );
@@ -67,6 +71,9 @@ class UserServiceTest {
         sportObject.setActive ( 1 );
         sportObject.setBadminton ( true );
         sportObject.setVolleyball ( true );
+        sportObject.setStreet ( "XDYZ" );
+        sportObject.setLatitude ( 51.788901 );
+        sportObject.setLongitude ( 19.439388 );
         sportObject.setHandball ( false );
         sportObject.setSoccer ( false );
         sportObject.setFutsal ( true );
@@ -76,6 +83,7 @@ class UserServiceTest {
         sportObject.setObjectPhotos ( new ArrayList <> ( ) );
         sportObject.setPaymentHisotries ( new ArrayList <> ( ) );
         sportObject.setObjectStars ( new ArrayList <> ( ) );
+        sportObject.setZipcodecity ( "90-001" );
         sportObject.setName ( "Mosir Skorupki " );
 
 //ocena hali
@@ -86,11 +94,25 @@ class UserServiceTest {
         //objectStars.setSportObject ( sportObject );
         objectStarsRepository.save ( objectStars );
 
+
+        OpenHours openHours = new OpenHours ( );
+        openHours.setFridayHours ( "06:00-20:00" );
+        openHours.setThrusdayHours ( "16:00-20:00" );
+        openHours.setMondayHours ( "16:00-20:00" );
+        openHours.setTusedayHours ( "16:00-20:00" );
+        openHours.setWensdayHours ( "16:00-20:00" );
+        openHours.setSaturdayHours ( "16:00-20:00" );
+        openHours.setSundayHours ( "00:00-00:00" );
+        openHours.setSportobjectid ( 1 );
+        if ( openHoursRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
+            openHoursRepository.save ( openHours );
+        }
+
 //ulubione obiekty
-        FavouriteObjects favouriteObject = new FavouriteObjects ();
-        favouriteObject.setSportobjectid ( (long) 1 );
-        favouriteObject.setUserid ( (long)1 );
-        if(favouriteObjectsRepository.findByUserid (( long) 1 ).size ()==0){
+        FavouriteObjects favouriteObject = new FavouriteObjects ( );
+        favouriteObject.setSportobjectid ( ( long ) 1 );
+        favouriteObject.setUserid ( ( long ) 1 );
+        if ( favouriteObjectsRepository.findByUserid ( ( long ) 1 ).size ( ) == 0 ) {
             favouriteObjectsRepository.save ( favouriteObject );
         }
 //terminarz dla hali nr 1
@@ -98,13 +120,13 @@ class UserServiceTest {
         timeTable.setPrice ( ( long ) 100 );
         timeTable.setPaymenttype ( "pp" );
         timeTable.setRenterid ( ( long ) 1 );
-        Date start = new DateTime ( 2018 , 12 , 20, 18 , 00  ).toDate ( );
+        Date start = new DateTime ( 2018 , 12 , 20 , 18 , 00 ).toDate ( );
         Date end = new DateTime ( 2018 , 12 , 20 , 19 , 00 ).toDate ( );
 
         timeTable.setStartrent ( start );
         timeTable.setEndrend ( end );
         timeTable.setSportobjectid ( ( long ) 1 );
-        if ( timeTableReposiotry.findAllBySportobjectid ( ( long ) 1 ).size () == 0 ) {
+        if ( timeTableReposiotry.findAllBySportobjectid ( ( long ) 1 ).size ( ) == 0 ) {
             timeTableReposiotry.save ( timeTable );
         }
 //Widocznosc peirwszej hali w mapach
@@ -121,12 +143,13 @@ class UserServiceTest {
         }
 
 
-
 //Co hala oferuje
         ObjectExtras objectExtras = new ObjectExtras ( );
         objectExtras.setParking ( true );
         objectExtras.setArtificiallighting ( true );
-        objectExtras.setToilets ( true );
+        objectExtras.setBathroom ( true );
+        objectExtras.setLockerroom ( true );
+        objectExtras.setEquipment ( false );
         objectExtras.setSportobjectid ( ( long ) 1 );
         if ( objectExstrasRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
             objectExstrasRepository.save ( objectExtras );
@@ -146,14 +169,14 @@ class UserServiceTest {
             e.printStackTrace ( );
         }
 
-        objectPhoto.setPhoto ( fileContent);
+        objectPhoto.setPhoto ( fileContent );
         if ( objectPhotosRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
             objectPhotosRepository.save ( objectPhoto );
         }
 //hisotria paltnosci za hale
 
         PaymentHisotry paymentHisotry = new PaymentHisotry ( );
-        if ( paymentHistoryRepository.findAllBySportobjectid ((long) 1).size () == 0 ) {
+        if ( paymentHistoryRepository.findAllBySportobjectid ( ( long ) 1 ).size ( ) == 0 ) {
 
             paymentHisotry.setCost ( 100 );
             paymentHisotry.setUserid ( ( long ) 1 );
@@ -172,6 +195,7 @@ class UserServiceTest {
             sportObject.getObjectPhotos ( ).add ( objectPhoto );
             sportObject.getPaymentHisotries ( ).add ( paymentHisotry );
             sportObject.getObjectStars ( ).add ( objectStars );
+            sportObject.setOpenHours ( openHours );
             sportObject.setOpen ( "06:00" );
             sportObject.setClose ( "20:00" );
 
@@ -196,9 +220,6 @@ class UserServiceTest {
         }
 
 
-
-
-
         if ( userRepository.findByUsername ( "admin" ) == null ) {
             User test = new User ( );
             test.setPassword ( "admin" );
@@ -208,11 +229,11 @@ class UserServiceTest {
             test.setPhoneno ( "790 540 834" );
             test.setLastname ( "Kajdan" );
             test.setFirstname ( "Szymon" );
-            test.setDateofbirth ( "03/28/1996");
+            test.setDateofbirth ( "03/28/1996" );
             test.setSportObjects ( new ArrayList <> ( ) );
             test.getSportObjects ( ).add ( sportObject );
-            test.setFavouriteObjects ( new ArrayList <> (  ) );
-            test.getFavouriteObjects ().add ( favouriteObject );
+            test.setFavouriteObjects ( new ArrayList <> ( ) );
+            test.getFavouriteObjects ( ).add ( favouriteObject );
 
             System.out.println ( "inializuje uytkonikow" );
             test.setPaymentHisotries ( new ArrayList <> ( ) );

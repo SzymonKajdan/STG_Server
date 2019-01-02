@@ -14,11 +14,13 @@ public class ObjectExtras {
 
     private boolean parking;
 
-    private  boolean toilets;
+    private  boolean bathroom;
 
     private  boolean artificiallighting;
 
-    private  boolean balls;
+    private  boolean lockerroom;
+
+    private  boolean equipment;
 
 
     public Long getId ( ) {
@@ -50,15 +52,6 @@ public class ObjectExtras {
         this.parking = parking;
     }
 
-    public
-    boolean isToilets ( ) {
-        return toilets;
-    }
-
-    public
-    void setToilets ( boolean toilets ) {
-        this.toilets = toilets;
-    }
 
     public
     boolean isArtificiallighting ( ) {
@@ -71,12 +64,32 @@ public class ObjectExtras {
     }
 
     public
-    boolean isBalls ( ) {
-        return balls;
+    boolean isBathroom ( ) {
+        return bathroom;
     }
 
     public
-    void setBalls ( boolean balls ) {
-        this.balls = balls;
+    void setBathroom ( boolean bathroom ) {
+        this.bathroom = bathroom;
+    }
+
+    public
+    boolean isLockerroom ( ) {
+        return lockerroom;
+    }
+
+    public
+    void setLockerroom ( boolean lockerroom ) {
+        this.lockerroom = lockerroom;
+    }
+
+    public
+    boolean isEquipment ( ) {
+        return equipment;
+    }
+
+    public
+    void setEquipment ( boolean equipment ) {
+        this.equipment = equipment;
     }
 }
