@@ -1,8 +1,11 @@
 package com.shareThegame.STG.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.Gson;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
+import com.shareThegame.STG.Wrapper.PhotoWrapper;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
@@ -44,18 +48,60 @@ class SportObjectController {
     @Autowired
     OpenHoursRepository openHoursRepository;
 
-    @PostMapping ( value = "/getObjecByCity", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/addNewObject", produces = "application/json",consumes="application/json" )
     public @ResponseBody
-    String getObjecByCity(String city) throws JsonProcessingException, JSONException {
+    String addNewObject ( @RequestBody String  object){
+        String useremail=userAuth ();
+        User user=userRepository.findByEmail ( useremail );
+
+        JSONObject json =new JSONObject ( object );
+        JSONObject sportobject=json.getJSONObject ( "sportObject" );
+        JSONObject objectextras=json.getJSONObject ( "objectExstras" );
+        JSONObject openhours=json.getJSONObject ( "openHours" );
+        JSONArray photos=json.getJSONArray ( "photos" );
         JSONObject jsonObject=new JSONObject (  );
-        Map<String,Object> lista_hal = new HashMap<>();
-        List<SportObject>ObjectinCity= sportObjectReposiotry.findAllByCity ( city );
 
-        jsonObject.put ( "Terminarz",ObjectinCity );
+        ObjectExtras objectExtras=parseObjectExtras(objectextras);
+        OpenHours openHours=parseOpenHours(openhours);
+        if(user!=null) {
 
+
+            List <ObjectPhotos> objectPhotosList = parseObjectPhotos ( photos );
+
+            objectExstrasRepository.save ( objectExtras );
+            openHoursRepository.save ( openHours );
+            objectPhotosRepository.saveAll ( objectPhotosList );
+
+
+            SportObject sportObject = parseSportObject ( sportobject );
+            sportObject.setOwnid ( user.getId ( ) );
+            sportObject.setObjectExtras ( objectExtras );
+            sportObject.setOpenHours ( openHours );
+            sportObject.setObjectPhotos ( objectPhotosList );
+            sportObjectReposiotry.save ( sportObject );
+
+            objectExtras.setSportobjectid ( sportObject.getId ( ) );
+            openHours.setSportobjectid ( sportObject.getId ( ) );
+
+            for (ObjectPhotos it : objectPhotosList) {
+                it.setSportobjectid ( sportObject.getId ( ) );
+            }
+
+            objectExstrasRepository.save ( objectExtras );
+            openHoursRepository.save ( openHours );
+            objectPhotosRepository.saveAll ( objectPhotosList );
+
+
+            jsonObject.put ( "message" , "SUCCESS" );
+            jsonObject.put ( "id",sportObject.getId () );
+        }
+        else{
+
+            jsonObject.put ( "message" , "FAILED " );
+        }
         return jsonObject.toString ();
-
     }
+
 
     @PostMapping(value = "/getAllObjects", produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
     public @ResponseBody
@@ -123,7 +169,7 @@ class SportObjectController {
     int boolToInt(boolean b) {
         return Boolean.compare(b, false);
     }
-    @PostMapping(value = "/addObject" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @PostMapping(value = "/addObject" ,produces = "application/json")
     public @ResponseBody
     String addObject( @Valid SportObject sportObject,@Valid ObjectExtras objectExtras,@Valid OpenHours openHours ){
         String useremial;
@@ -154,7 +200,15 @@ class SportObjectController {
             sportObject.setObjectExtras ( objectExtras );
             sportObject.setOpenHours (  openHours );
             sportObject.setOwnid ( user.getId ( ) );
+
+
+
+
             user.getSportObjects ().add ( sportObject );
+
+
+
+
             sportObjectReposiotry.save ( sportObject );
 
 
@@ -248,11 +302,125 @@ class SportObjectController {
             }
 
     }
-    @PostMapping(value = "/updateObject" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @PostMapping(value = "/updateObject" ,produces = "application/json",consumes = "application/json")
     public @ResponseBody
-    String updateObject(@Valid SportObject sportObject){
+    String updateObject(@RequestBody String  object){
+        String usermail=userAuth ();
+        User user=userRepository.findByEmail ( usermail );
 
-        return "";
+        JSONObject json =new JSONObject ( object );
+        JSONObject sportobject=json.getJSONObject ( "sportObject" );
+        JSONObject objectextras=json.getJSONObject ( "objectExstras" );
+        JSONObject openhours=json.getJSONObject ( "openHours" );
+        JSONArray photos=json.getJSONArray ( "photos" );
+
+        SportObject sportObject=parseSportObject ( sportobject );
+        ObjectExtras objectExtras=parseObjectExtras ( objectextras );
+        OpenHours openHours=parseOpenHours ( openhours );
+        List <ObjectPhotos> objectPhotosList = parseObjectPhotos ( photos );
+
+        SportObject toUpdate=sportObjectReposiotry.getOne ( sportObject.getId () );
+      if(user.getId ()==toUpdate.getOwnid ()&&toUpdate!=null) {
+          List<ObjectPhotos>objectPhotosToDelete=objectPhotosRepository.findAllBySportobjectid ( sportObject.getId () );
+          if(objectPhotosToDelete.size ()!=0){
+              toUpdate.getObjectPhotos ().removeAll ( objectPhotosToDelete );
+              objectPhotosRepository.deleteAll (objectPhotosToDelete);
+          }
+
+          OpenHours openHoursToUpdate=openHoursRepository.findBySportobjectid ( sportObject.getId () );
+          upOpenHoursOfObject ( openHoursToUpdate,openHours );
+
+
+          openHoursToUpdate.setSportobjectid ( sportObject.getId () );
+          openHoursRepository.save ( openHoursToUpdate );
+
+
+          ObjectExtras objectExtrasToUpdate=objectExstrasRepository.findBySportobjectid ( sportObject.getId () );
+          upExtsrasOfSportObject ( objectExtrasToUpdate,objectExtras );
+          objectExtrasToUpdate.setSportobjectid ( sportObject.getId () );
+          objectExstrasRepository.save ( objectExtrasToUpdate );
+
+
+          List<ObjectPhotos> photosToUpdate=objectPhotosRepository.findAllBySportobjectid ( sportObject.getId () );
+          upObjectPhostos ( photosToUpdate,objectPhotosList );
+          System.out.println (objectPhotosList.size () );
+          for(ObjectPhotos it:photosToUpdate){
+              it.setSportobjectid ( sportObject.getId () );
+          }
+          objectPhotosRepository.saveAll ( objectPhotosList );
+
+        upSportObject ( toUpdate,sportObject,openHoursToUpdate,objectExtrasToUpdate,photosToUpdate );
+
+
+
+          //System.out.println (openHours.getSportobjectid () );
+
+          sportObjectReposiotry.save ( toUpdate );
+          return new JSONObject (  ).put ( "stats","updated" ).toString ();
+      }else{
+          return new JSONObject (  ).put ( "stats","error" ).toString ();
+      }
+
+    }
+
+    private  void upObjectPhostos(List<ObjectPhotos> photosListToUpdate,List<ObjectPhotos> objectPhotos){
+        photosListToUpdate.clear ();
+
+            photosListToUpdate.addAll ( objectPhotos );
+
+    }
+
+    private
+    void upSportObject(SportObject toUpdate, SportObject sportObject,OpenHours openHours,ObjectExtras objectExtras,List<ObjectPhotos> objectPhotos){
+        toUpdate.setOpenHours ( openHours );
+        toUpdate.setObjectExtras ( objectExtras );
+        toUpdate.setEmail ( sportObject.getEmail () );
+        toUpdate.setZipcodecity ( sportObject.getZipcodecity () );
+        toUpdate.setZipcode ( sportObject.getZipcode () );
+        toUpdate.setLongitude ( sportObject.getLongitude () );
+        toUpdate.setLatitude ( sportObject.getLatitude () );
+        toUpdate.setPhoneno (sportObject.getPhoneno ());
+        toUpdate.setStreet ( sportObject.getStreet () );
+        toUpdate.setCity ( sportObject.getCity () );
+        toUpdate.setLocalno ( sportObject.getLocalno () );
+        toUpdate.setPpmail (sportObject.getPpmail ());
+        toUpdate.setActive ( 1 );
+        toUpdate.setRentprice ( sportObject.getRentprice () );
+        toUpdate.setName ( sportObject.getName () );
+        toUpdate.setFutsal ( sportObject.isFutsal () );
+        toUpdate.setBasketball ( sportObject.isBasketball () );
+
+        toUpdate.setVolleyball ( sportObject.isVolleyball () );
+        toUpdate.setSoccer ( sportObject.isSoccer () );
+        toUpdate.setTennis ( sportObject.isTennis () );
+        toUpdate.setSquash ( sportObject.isSquash () );
+        toUpdate.setHandball ( sportObject.isHandball () );
+        toUpdate.setBadminton ( sportObject.isBadminton () );
+        toUpdate.setSiteaddress ( sportObject.getSiteaddress () );
+        toUpdate.setEmail ( sportObject.getEmail () );
+        toUpdate.setObjectPhotos ( objectPhotos );
+
+    }
+
+    private void upOpenHoursOfObject(OpenHours openHoursToUpdate,OpenHours openHours){
+        openHoursToUpdate.setMondayHours ( openHours.getMondayHours () );
+        openHoursToUpdate.setTusedayHours ( openHours.getTusedayHours () );
+        openHoursToUpdate.setThrusdayHours ( openHours.getThrusdayHours () );
+        openHoursToUpdate.setWensdayHours ( openHours.getWensdayHours () );
+        openHoursToUpdate.setFridayHours ( openHours.getFridayHours () );
+        openHoursToUpdate.setSaturdayHours ( openHours.getSaturdayHours () );
+        openHoursToUpdate.setSundayHours ( openHours.getSundayHours () );
+
+        System.out.println (openHours.isOpenInBankHolidays () );
+        openHoursToUpdate.setOpenInBankHolidays (  openHours.isOpenInBankHolidays ());
+    }
+
+    private  void upExtsrasOfSportObject(ObjectExtras objectExtrasToUpdate,ObjectExtras objectExtras){
+        objectExtrasToUpdate.setEquipment ( objectExtras.isEquipment () );
+        objectExtrasToUpdate.setLockerroom ( objectExtras.isLockerroom () );
+        objectExtrasToUpdate.setBathroom ( objectExtras.isBathroom () );
+        objectExtrasToUpdate.setArtificiallighting ( objectExtras.isArtificiallighting () );
+        objectExtrasToUpdate.setParking ( objectExtras.isParking () );
     }
     private
     String userAuth () {
@@ -283,4 +451,42 @@ class SportObjectController {
             return  0;
         }
     }
+
+    private SportObject parseSportObject(JSONObject  sportObject){
+
+        Gson g = new Gson();
+        SportObject p = g.fromJson(sportObject.toString (), SportObject.class);
+        return  p;
+    }
+
+    private ObjectExtras parseObjectExtras(JSONObject objectExstras){
+        Gson g=new Gson ();
+        ObjectExtras obj=g.fromJson (objectExstras.toString (),ObjectExtras.class  );
+        return obj;
+    }
+    private
+    OpenHours parseOpenHours ( JSONObject openhours ) {
+        Gson g=new Gson ();
+        OpenHours obj=g.fromJson (openhours.toString (),OpenHours.class  );
+        return obj;
+    }
+    private
+    List<ObjectPhotos> parseObjectPhotos ( JSONArray photos ) {
+        PhotoWrapper photoWrapper=new PhotoWrapper ();
+        List <ObjectPhotos> list = new ArrayList <> ( );
+        for (int i=0 ;i<photos.length ();i++){
+
+           // System.out.println (photo.get ( i ) );
+          ObjectPhotos objectPhotos=new ObjectPhotos ();
+          String tmp= ( String ) photos.get ( i );
+          objectPhotos.setPhoto ( tmp);
+            list.add ( objectPhotos );
+
+        }
+
+
+
+        return list;
+    }
+
 }

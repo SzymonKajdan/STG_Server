@@ -12,7 +12,7 @@ class OpenHours {
     @GeneratedValue ( strategy = GenerationType.IDENTITY )
     private Long id;
     long sportobjectid;
-    boolean isOpenInBankHolidays;
+    boolean openInBankHolidays;
     String  mondayHours;
     String  tusedayHours;
     String  wensdayHours;
@@ -43,12 +43,12 @@ class OpenHours {
 
     public
     boolean isOpenInBankHolidays ( ) {
-        return isOpenInBankHolidays;
+        return openInBankHolidays;
     }
 
     public
     void setOpenInBankHolidays ( boolean openInBankHolidays ) {
-        isOpenInBankHolidays = openInBankHolidays;
+        this.openInBankHolidays = openInBankHolidays;
     }
 
     public

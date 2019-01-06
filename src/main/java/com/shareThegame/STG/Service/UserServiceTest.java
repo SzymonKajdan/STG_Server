@@ -164,12 +164,12 @@ class UserServiceTest {
         byte[] fileContent = null;
         try {
             ClassPathResource imgFile = new ClassPathResource ( "img/2.jpg" );
-            fileContent = StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) );
+            objectPhoto.setPhoto ( StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) ) );
         } catch ( IOException e ) {
             e.printStackTrace ( );
         }
 
-        objectPhoto.setPhoto ( fileContent );
+
         if ( objectPhotosRepository.findBySportobjectid ( ( long ) 1 ) == null ) {
             objectPhotosRepository.save ( objectPhoto );
         }

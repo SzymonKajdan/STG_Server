@@ -489,5 +489,23 @@ class SportObject {
         return dt.toDate ();
 
     }
+    public
+    Date getDate ( String day,int month ,int dayofMonth,int year ) {
+        int hour = Integer.parseInt ( day.substring ( 0 , 2 ) );
+        String min = day.substring ( 3 , 5 );
+        int minutes;
+        if ( min.equals ( "00" ) ) {
+            minutes = 0;
+        }
+        else {
+            minutes = 30;
+        }
+        DateTime dt = new DateTime().withMonthOfYear ( month ).withYear (  year ).withDayOfMonth ( dayofMonth )
+                .withHourOfDay(hour)
+                .withMinuteOfHour(minutes)
+                .withSecondOfMinute(0).withMillisOfSecond ( 0 );
+        //   System.out.println (hour );
+        return dt.toDate ();
 
+    }
 }

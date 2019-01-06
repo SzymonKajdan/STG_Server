@@ -39,10 +39,11 @@ class TimeTableController {
 
     @PostMapping ( value = "/ReserveHall", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
-    String reserve ( @Valid TimeTable timeTable , String end , String start ) throws ParseException {
+    String reserve ( Long sportobjectid , String end , String start ,String statusOfPayment) throws ParseException {
 
-        List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectid ( timeTable.getSportobjectid ( ) );
-        Collections.sort ( timeTableList );
+
+
+
 
         DateTime postStartRent;
         DateTime postEndRent;
@@ -55,7 +56,17 @@ class TimeTableController {
         postEndRent = pasreDate ( end );
         Date postEndRentDate = postEndRent.toDate ( );
         JSONObject jsonObject = new JSONObject ( );
-        boolean iscorrect = checkCorrectOfRequest ( timeTable.getSportobjectid ( ) , postStartRent , postEndRent );
+        DateTime dt = new DateTime().withYear ( postEndRent.getYear () ).withDayOfMonth ( postEndRent.getDayOfMonth () ).withMonthOfYear ( postEndRent.getMonthOfYear () )
+                .withHourOfDay(23)
+                .withMinuteOfHour(59)
+                .withSecondOfMinute(59).withMillisOfSecond ( 59 );
+        DateTime dt1 = new DateTime().withYear ( postEndRent.getYear () ).withDayOfMonth ( postEndRent.getDayOfMonth () ).withMonthOfYear ( postEndRent.getMonthOfYear () )
+                .withHourOfDay(0)
+                .withMinuteOfHour(0)
+                .withSecondOfMinute(0).withMillisOfSecond ( 0 );
+        List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore (sportobjectid,dt1.toDate (),dt.toDate () );
+        Collections.sort ( timeTableList );
+        boolean iscorrect = checkCorrectOfRequest ( sportobjectid , postStartRent , postEndRent );
         if ( iscorrect == true ) {
 
             if ( timeTableList.size ( ) > 0 ) {
@@ -73,15 +84,21 @@ class TimeTableController {
 
 
             if ( isFree == false ) {
-                jsonObject.put ( "status" , "hala zjeta w tym terminie" );
+                jsonObject.put ( "status" , "SPORTOBJECT_IS_NOT_AVALAVILE" );
             }
             else {
                 String username = userAuth ( );
 
                 isFree = true;
 
+
                 User user = userRepository.findByEmail ( username );
-                SportObject sportObject = sportObjectReposiotry.getOne ( timeTable.getSportobjectid ( ) );
+                SportObject sportObject = sportObjectReposiotry.getOne ( sportobjectid);
+                boolean status=chceckStatus ( statusOfPayment );
+
+                TimeTable timeTable=new TimeTable ();
+                timeTable.setSportobjectid ( sportobjectid );
+
 
                 //set timetable
                 timeTable.setRenterid ( user.getId ( ) );
@@ -95,7 +112,7 @@ class TimeTableController {
                 PaymentHisotry paymentHisotry = new PaymentHisotry ( );
                 paymentHisotry.setStartrent ( postStartRent.toDate ( ) );
                 paymentHisotry.setExprrent ( postEndRent.toDate ( ) );
-                paymentHisotry.setStautsofpayment ( false );
+                paymentHisotry.setStautsofpayment ( status );
                 paymentHisotry.setSportobjectid ( sportObject.getId ( ) );
                 paymentHisotry.setUserid ( user.getId ( ) );
                 paymentHisotry.setSportObject ( sportObject );
@@ -113,11 +130,11 @@ class TimeTableController {
                 sportObject.getTimeTable ( ).add ( timeTable );
                 sportObjectReposiotry.save ( sportObject );
 
-                jsonObject.put ( "status" , "hala wolona w tym temrinie dokonano rezerwacji" );
+                jsonObject.put ( "status" , "RESERVATION_CONFRIMED" );
             }
         }
         else {
-            jsonObject.put ( "satsus","Error" );
+            jsonObject.put ( "status","REQUEST_FAILED" );
         }
         return jsonObject.toString ( );
 
@@ -154,13 +171,21 @@ class TimeTableController {
         for (TimeTable item : timeTableList) {
             int first = getHourCount ( localopen , item.getStartrent ( ) );
             int last = getHourCount ( localopen , item.getEndrend ( ) ) - 1;
-            ;
-            //   System.out.println ( "pocztaek " + first + "    " + " koniuec " + last );
-            for (int i = first; i <= last; i++) {
+            PaymentHisotry paymentHisotry = paymentHistoryRepository.findBySportobjectidAndAndStartrentAndExprrent ( sportobjectid , item.getStartrent ( ) , item.getEndrend ( ) );
+            if ( paymentHisotry.isStautsofpayment ( ) == true ) {
 
-                timetabletoreturn.setCharAt ( i , '1' );
+                for (int i = first; i <= last; i++) {
+
+                    timetabletoreturn.setCharAt ( i , '1' );
+                }
             }
+            else {
 
+                for (int i = first; i <= last; i++) {
+
+                    timetabletoreturn.setCharAt ( i , '4' );
+                }
+            }
         }
 
 
@@ -173,11 +198,12 @@ class TimeTableController {
     @PostMapping ( value = "/ChangeReservation", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
     String changeReservation ( Long sportobjectid , String end , String start , String newstart , String newend ) {
+        JSONObject jsonObject = new JSONObject ( );
         boolean isFree = true;
         DateTime oldPostStartRent;
         DateTime oldPostEndRent;
-        DateTime newPostStartRent;
-        DateTime newPostEndRent;
+
+
 
         oldPostStartRent = pasreDate ( start );
         Date oldPostStartRentDate = oldPostStartRent.toDate ( );
@@ -185,87 +211,101 @@ class TimeTableController {
         oldPostEndRent = pasreDate ( end );
         Date oldPostEndRentDate = oldPostEndRent.toDate ( );
 
-        newPostStartRent = pasreDate ( newstart );
+        DateTime newPostStartRent = pasreDate ( newstart );
         Date newPostStartRentDate = newPostStartRent.toDate ( );
 
-        newPostEndRent = pasreDate ( newend );
+        DateTime newPostEndRent = pasreDate ( newend );
         Date newPostEndRentDate = newPostEndRent.toDate ( );
 
-        ArrayList <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectid ( sportobjectid );
-        Collections.sort ( timeTableList );
-        if ( timeTableList.size ( ) > 0 ) {
-            isFree = chceckAvalabile ( timeTableList , newPostStartRentDate , newPostEndRentDate );
+        DateTime dt = new DateTime().withYear ( newPostStartRent.getYear () ).withDayOfMonth ( newPostStartRent.getDayOfMonth () ).withMonthOfYear ( newPostStartRent.getMonthOfYear () )
+                .withHourOfDay(23)
+                .withMinuteOfHour(59)
+                .withSecondOfMinute(59).withMillisOfSecond ( 59 );
 
-        }
-        else {
-            isFree = true;
-        }
-
-
-        JSONObject jsonObject = new JSONObject ( );
-        if ( isFree == false ) {
-            jsonObject.put ( "status" , "hala zjeta w tym terminie" );
-        }
-        else {
-
-            TimeTable timeTableToChange = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( oldPostStartRentDate , oldPostEndRentDate , sportobjectid );
-            if ( timeTableToChange != null ) {
-
-                String username = userAuth ( );
-                User user = userRepository.findByEmail ( username );
-                SportObject sportObject = sportObjectReposiotry.getOne ( timeTableToChange.getSportobjectid ( ) );
-                PaymentHisotry paymentHisotry = paymentHistoryRepository.findBySportobjectidAndAndStartrentAndExprrent ( sportobjectid , oldPostStartRentDate , oldPostEndRentDate );
-                // System.out.println (oldPostStartRentDate);
-
-                //delete old reserv
-                deleteReserv ( timeTableToChange , user );
-                TimeTable timeTable1 = new TimeTable ( );
-                timeTable1.setStartrent ( newPostStartRentDate );
-                timeTable1.setEndrend ( newPostEndRentDate );
-                timeTable1.setSportobjectid ( sportobjectid );
-                timeTable1.setRenterid ( user.getId ( ) );
-
-                double time = newPostEndRent.toDate ( ).getTime ( ) - newPostStartRent.toDate ( ).getTime ( );
-                time /= 3600000;
-                timeTable1.setPrice ( time * sportObject.getRentprice ( ) );
-                timeTable1.setStartrent ( newPostStartRentDate );
-                timeTable1.setEndrend ( newPostEndRentDate );
-                PaymentHisotry paymentHisotry1 = new PaymentHisotry ( );
-                paymentHisotry1.setStartrent ( newPostStartRentDate );
-                paymentHisotry1.setExprrent ( newPostEndRentDate );
-                paymentHisotry1.setStautsofpayment ( false );
-                paymentHisotry1.setSportobjectid ( sportObject.getId ( ) );
-                paymentHisotry1.setUserid ( user.getId ( ) );
-                paymentHisotry1.setSportObject ( sportObject );
-                paymentHisotry1.setCost ( time * sportObject.getRentprice ( ) );
-                paymentHisotry1.setUser ( user );
-                paymentHisotry1.setUserid ( user.getId ( ) );
-                paymentHisotry1.setSportobjectid ( sportobjectid );
-
-                paymentHistoryRepository.save ( paymentHisotry1 );
-
-
-                user.getPaymentHisotries ( ).add ( paymentHisotry1 );
-                sportObject.getPaymentHisotries ( ).add ( paymentHisotry1 );
-
-                userRepository.save ( user );
-                timeTableReposiotry.save ( timeTable1 );
-                sportObjectReposiotry.save ( sportObject );
-
-
-                sportObject.getTimeTable ( ).add ( timeTable1 );
-                //System.out.println ( "id " + timeTable1.getId ( ) );
-                sportObjectReposiotry.save ( sportObject );
-
-
-                jsonObject.put ( "status" , "udana zmiana rezerwacji " );
+        DateTime dt1 = new DateTime().withYear ( newPostEndRent.getYear () ).withDayOfMonth ( newPostEndRent.getDayOfMonth () ).withMonthOfYear ( newPostEndRent.getMonthOfYear () )
+                .withHourOfDay(0)
+                .withMinuteOfHour(0)
+                .withSecondOfMinute(0).withMillisOfSecond ( 0 );
+        boolean iscorrect = checkCorrectOfRequest ( sportobjectid,newPostStartRent,newPostEndRent );
+        if ( iscorrect == true ) {
+            List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore ( sportobjectid , dt.toDate ( ) , dt1.toDate ( ) );
+            Collections.sort ( timeTableList );
+            if ( timeTableList.size ( ) > 0 ) {
+                isFree = chceckAvalabile ( timeTableList , newPostStartRentDate , newPostEndRentDate );
 
             }
             else {
-                jsonObject.put ( "status" , "blad" );
-
+                isFree = true;
             }
 
+
+
+            if ( isFree == false ) {
+                jsonObject.put ( "status" , "hala zjeta w tym terminie" );
+            }
+            else {
+
+                TimeTable timeTableToChange = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( oldPostStartRentDate , oldPostEndRentDate , sportobjectid );
+                if ( timeTableToChange != null ) {
+
+                    String username = userAuth ( );
+                    User user = userRepository.findByEmail ( username );
+                    SportObject sportObject = sportObjectReposiotry.getOne ( timeTableToChange.getSportobjectid ( ) );
+                    PaymentHisotry paymentHisotry = paymentHistoryRepository.findBySportobjectidAndAndStartrentAndExprrent ( sportobjectid , oldPostStartRentDate , oldPostEndRentDate );
+                    // System.out.println (oldPostStartRentDate);
+
+                    //delete old reserv
+                    deleteReserv ( timeTableToChange , user );
+                    TimeTable timeTable1 = new TimeTable ( );
+                    timeTable1.setStartrent ( newPostStartRentDate );
+                    timeTable1.setEndrend ( newPostEndRentDate );
+                    timeTable1.setSportobjectid ( sportobjectid );
+                    timeTable1.setRenterid ( user.getId ( ) );
+
+                    double time = newPostEndRent.toDate ( ).getTime ( ) - newPostStartRent.toDate ( ).getTime ( );
+                    time /= 3600000;
+                    timeTable1.setPrice ( time * sportObject.getRentprice ( ) );
+                    timeTable1.setStartrent ( newPostStartRentDate );
+                    timeTable1.setEndrend ( newPostEndRentDate );
+                    PaymentHisotry paymentHisotry1 = new PaymentHisotry ( );
+                    paymentHisotry1.setStartrent ( newPostStartRentDate );
+                    paymentHisotry1.setExprrent ( newPostEndRentDate );
+                    paymentHisotry1.setStautsofpayment ( false );
+                    paymentHisotry1.setSportobjectid ( sportObject.getId ( ) );
+                    paymentHisotry1.setUserid ( user.getId ( ) );
+                    paymentHisotry1.setSportObject ( sportObject );
+                    paymentHisotry1.setCost ( time * sportObject.getRentprice ( ) );
+                    paymentHisotry1.setUser ( user );
+                    paymentHisotry1.setUserid ( user.getId ( ) );
+                    paymentHisotry1.setSportobjectid ( sportobjectid );
+
+                    paymentHistoryRepository.save ( paymentHisotry1 );
+
+
+                    user.getPaymentHisotries ( ).add ( paymentHisotry1 );
+                    sportObject.getPaymentHisotries ( ).add ( paymentHisotry1 );
+
+                    userRepository.save ( user );
+                    timeTableReposiotry.save ( timeTable1 );
+                    sportObjectReposiotry.save ( sportObject );
+
+
+                    sportObject.getTimeTable ( ).add ( timeTable1 );
+                    //System.out.println ( "id " + timeTable1.getId ( ) );
+                    sportObjectReposiotry.save ( sportObject );
+
+
+                    jsonObject.put ( "status" , "udana zmiana rezerwacji " );
+
+                }
+                else {
+                    jsonObject.put ( "status" , "blad" );
+
+                }
+
+            }
+        }else{
+            jsonObject.put ( "status","error" );
         }
         return jsonObject.toString ( );
     }
@@ -367,34 +407,35 @@ class TimeTableController {
     private
     Boolean chceckAvalabile ( List <TimeTable> timeTableList , Date postStartRentDate , Date postEndRentDate ) {
         boolean isFree = true;
-        System.out.println ("request start"+postStartRentDate.getTime ()+" "+postEndRentDate.getTime () );
-        if ( timeTableList.size ( ) > 1 ) {
+        System.out.println ("rozmair "+timeTableList.size ());
 
-            for (int i = 0; i < timeTableList.size ( ) - 1; i++) {
 
-                System.out.println ("hala   rezerwqacja  start "+ timeTableList.get ( i ).getStartrent ().getTime ()+ " hala koniec "+ timeTableList.get ( i ).getEndrend ().getTime ());
-                if ( ( timeTableList.get ( i ).getStartrent ( ).getTime ( ) == postStartRentDate.getTime ( ) )
-                        || ( postStartRentDate.getTime ( ) >= timeTableList.get ( i ).getStartrent ( ).getTime ( )
-                        && postStartRentDate.getTime ( ) < timeTableList.get ( i ).getEndrend ( ).getTime ( ) )
-                        || ( postEndRentDate.getTime ( ) > timeTableList.get ( i + 1 ).getStartrent ( ).getTime ( ) &&
-                        postEndRentDate.getTime ( ) <= timeTableList.get ( i + 1 ).getEndrend ( ).getTime ( )
-                )) {
+            for (int i = 0; i < timeTableList.size ( ) ; i++) {
+               System.out.println ( postStartRentDate.toString ()+" "+ postEndRentDate.toString ()+" Baza"+timeTableList.get ( i ).getStartrent ().toString ()+" "+ timeTableList.get ( i ).getEndrend ().toString ());
+               if(postStartRentDate.getTime ()<timeTableList.get ( i ).getStartrent ().getTime ()&& postEndRentDate.getTime ()<=timeTableList.get ( i ).getEndrend ().getTime ()&& postEndRentDate.getTime ( )>timeTableList.get ( i ).getStartrent ().getTime ()){
+                   System.out.println ("1 " +postStartRentDate.toString ()+" "+ postEndRentDate.toString ()+" Baza"+timeTableList.get ( i ).getStartrent ().toString ()+" "+ timeTableList.get ( i ).getEndrend ().toString ());
 
                     isFree = false;
                     break;
                 }
+                if(postStartRentDate.getTime ()>=timeTableList.get ( i ).getStartrent ().getTime ()&& postEndRentDate.getTime ()<=timeTableList.get ( i ).getEndrend ().getTime ()){
+                    System.out.println ("2 " +postStartRentDate.toString ()+" "+ postEndRentDate.toString ()+" Baza"+timeTableList.get ( i ).getStartrent ().toString ()+" "+ timeTableList.get ( i ).getEndrend ().toString ());
+                    isFree = false;
+                    break;
+                }
+                if(postStartRentDate.getTime ()<=timeTableList.get ( i ).getStartrent ().getTime ()&& postEndRentDate.getTime ()>=timeTableList.get ( i ).getEndrend ().getTime ()){
+                    System.out.println ("3 " +postStartRentDate.toString ()+" "+ postEndRentDate.toString ()+" Baza"+timeTableList.get ( i ).getStartrent ().toString ()+" "+ timeTableList.get ( i ).getEndrend ().toString ());
+                    isFree = false;
+                    break;
+                }
             }
-        }
-        else {
-
-            if ( timeTableList.get ( 0 ).getStartrent ( ).getTime ( ) == postStartRentDate.getTime ( ) ||
-                    ( postStartRentDate.getTime ( ) >= timeTableList.get ( 0 ).getStartrent ( ).getTime ( ) && postStartRentDate.getTime ( ) < timeTableList.get ( 0 ).getEndrend ( ).getTime ( ) ) ) {
-
-                isFree = false;
-            }
 
 
-        }
+
+
+
+
+
         return isFree;
     }
 
@@ -441,9 +482,9 @@ class TimeTableController {
         OpenHours openHours = openHoursRepository.findBySportobjectid ( sportObjectid );
         List <String> opens = chcekDay ( start , openHours );
         SportObject sp = sportObjectReposiotry.getOne ( sportObjectid );
-        Date localopen = sp.getDate ( opens.get ( 0 ) );
-        Date localclose = sp.getDate ( opens.get ( 1 ) );
-
+        Date localopen = sp.getDate ( opens.get ( 0 ) ,start.getMonthOfYear (),start.getDayOfMonth (),start.getYear ());
+        Date localclose = sp.getDate ( opens.get ( 1 ),start.getMonthOfYear (),start.getDayOfMonth (),start.getYear () );
+        System.out.println ("Moj "+start.toString ()+" "+end.toString ()+ " baza "+localopen.toString ()+" "+localclose.toString () );
         if ( ( start.toDate ( ).getTime ( ) >= localopen.getTime ( ) && start.toDate ( ).getTime ( ) <= localclose.getTime ( ) ) && end.toDate ( ).getTime ( ) <= localclose.getTime ( ) ) {
 
 
@@ -530,5 +571,13 @@ class TimeTableController {
         interval.add ( close );
         return interval;
     }
+    private
+    boolean chceckStatus(String status){
+        if(status.equals ( "true" )){
+            return  true;
+        }else{
+            return false;
 
+        }
+    }
 }
