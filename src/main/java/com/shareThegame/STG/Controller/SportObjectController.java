@@ -246,7 +246,7 @@ class SportObjectController {
         String useremial=userAuth ();
         User user=userRepository.findByEmail ( useremial );
         SportObject sportObjectToDelete = sportObjectReposiotry.getOne ( sportObject.getId ( ) );
-        if(sportObject.getOwnid ()==user.getId ()&&sportObjectToDelete!=null) {
+        if(sportObjectToDelete.getOwnid ()==user.getId ()&&sportObjectToDelete!=null) {
 
             List<PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllBySportobjectid    ( sportObject.getId ( ) );
             List<ObjectPhotos> objectPhotosToDelete=objectPhotosRepository.findAllBySportobjectid ( sportObject.getId () );
@@ -303,7 +303,7 @@ class SportObjectController {
         return  new JSONObject ( ).put ( "status","DELETED" ).toString ();
         }
         else {
-             return new JSONObject (  ).put ( "message","Error" ).toString () ;
+             return new JSONObject (  ).put ( "status","Error" ).toString () ;
             }
 
     }

@@ -95,6 +95,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests ().antMatchers ( "/getUserPaymentHistory" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
+        http.authorizeRequests ().antMatchers ( "/getAllUserReserv" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
     }
     @Override

@@ -5,6 +5,7 @@ import com.shareThegame.STG.Repository.*;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,9 @@ class TimeTableController {
     PaymentHistoryRepository paymentHistoryRepository;
     @Autowired
     OpenHoursRepository openHoursRepository;
+
+
+
 
     @PostMapping ( value = "/ReserveHall", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
@@ -131,6 +135,7 @@ class TimeTableController {
                 sportObjectReposiotry.save ( sportObject );
 
                 jsonObject.put ( "status" , "RESERVATION_CONFRIMED" );
+                jsonObject.put ( "payment_id",paymentHisotry.getId () );
             }
         }
         else {
@@ -346,7 +351,32 @@ class TimeTableController {
 
 
     }
+    @PostMapping ( value = "/getAllUserReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+    String getAllUserReserv(){
+        String useremail=userAuth ();
+        User user=userRepository.findByEmail ( useremail );
+        List<TimeTable>timeTableList=timeTableReposiotry.findAllByRenterid ( user.getId () );
+        JSONArray jsonObject=new JSONArray (  );
+        for(TimeTable timeTable:timeTableList){
+            Map<String,Object> map=new HashMap <> (  );
+            JSONObject js=new JSONObject (  );
+            DateTime d1=new DateTime ( timeTable.getStartrent () );
+            DateTime d2=new DateTime ( timeTable.getEndrend () );
+            js.put ( "facilityid", timeTable.getSportobjectid ());
 
+            js.put ( "start",timeTable.getStartrent () );
+            js.put ( "end",timeTable.getEndrend () );
+
+            //js.put ( "hourend",d2.getHourOfDay ()+":"+d2.getMinuteOfHour () );
+            js.put ( "price",timeTable.getPrice () );
+            jsonObject.put ( js );
+        }
+        return jsonObject.toString ( );
+
+
+
+    }
     private
     void deleteReserv ( TimeTable timeTableToDelete , User user ) {
 
