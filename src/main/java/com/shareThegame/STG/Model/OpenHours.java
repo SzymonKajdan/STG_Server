@@ -1,5 +1,7 @@
 package com.shareThegame.STG.Model;
 
+import org.json.JSONPropertyIgnore;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +33,7 @@ class OpenHours {
         this.id = id;
     }
 
+    @JSONPropertyIgnore
     public
     long getSportobjectid ( ) {
         return sportobjectid;

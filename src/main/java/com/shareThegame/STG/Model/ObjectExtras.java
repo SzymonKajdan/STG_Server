@@ -1,5 +1,7 @@
 package com.shareThegame.STG.Model;
 
+import org.json.JSONPropertyIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -32,7 +34,7 @@ public class ObjectExtras {
     }
 
 
-
+    @JSONPropertyIgnore
     public long getSportobjectid() {
         return sportobjectid;
     }

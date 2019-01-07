@@ -1,6 +1,7 @@
 package com.shareThegame.STG.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
@@ -55,6 +56,8 @@ class SportObjectController {
         User user=userRepository.findByEmail ( useremail );
 
         JSONObject json =new JSONObject ( object );
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println(json);
         JSONObject sportobject=json.getJSONObject ( "sportObject" );
         JSONObject objectextras=json.getJSONObject ( "objectExstras" );
         JSONObject openhours=json.getJSONObject ( "openHours" );
@@ -78,6 +81,7 @@ class SportObjectController {
             sportObject.setObjectExtras ( objectExtras );
             sportObject.setOpenHours ( openHours );
             sportObject.setObjectPhotos ( objectPhotosList );
+            sportObject.setUser ( user );
             sportObjectReposiotry.save ( sportObject );
 
             objectExtras.setSportobjectid ( sportObject.getId ( ) );
@@ -90,7 +94,8 @@ class SportObjectController {
             objectExstrasRepository.save ( objectExtras );
             openHoursRepository.save ( openHours );
             objectPhotosRepository.saveAll ( objectPhotosList );
-
+            user.getSportObjects ().add ( sportObject );
+            userRepository.save ( user );
 
             jsonObject.put ( "message" , "SUCCESS" );
             jsonObject.put ( "id",sportObject.getId () );
@@ -295,7 +300,7 @@ class SportObjectController {
             sportObjectReposiotry.delete (  sportObjectToDelete );
 
 
-        return  new JSONObject ( ).put ( "xd","Xd" ).toString ();
+        return  new JSONObject ( ).put ( "status","DELETED" ).toString ();
         }
         else {
              return new JSONObject (  ).put ( "message","Error" ).toString () ;
@@ -356,9 +361,9 @@ class SportObjectController {
           //System.out.println (openHours.getSportobjectid () );
 
           sportObjectReposiotry.save ( toUpdate );
-          return new JSONObject (  ).put ( "stats","updated" ).toString ();
+          return new JSONObject (  ).put ( "status","UPDATED" ).toString ();
       }else{
-          return new JSONObject (  ).put ( "stats","error" ).toString ();
+          return new JSONObject (  ).put ( "status","ERROR" ).toString ();
       }
 
     }

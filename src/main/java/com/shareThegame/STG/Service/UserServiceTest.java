@@ -163,7 +163,7 @@ class UserServiceTest {
 
         byte[] fileContent = null;
         try {
-            ClassPathResource imgFile = new ClassPathResource ( "img/2.jpg" );
+            ClassPathResource imgFile = new ClassPathResource ( "img/3.jpg" );
             objectPhoto.setPhoto ( StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) ) );
         } catch ( IOException e ) {
             e.printStackTrace ( );

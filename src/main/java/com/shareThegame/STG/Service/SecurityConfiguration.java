@@ -93,6 +93,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests ().antMatchers ( "/deletePhoto" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
+        http.authorizeRequests ().antMatchers ( "/getUserPaymentHistory" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
+
+
     }
     @Override
     public void configure(WebSecurity web) throws Exception {
