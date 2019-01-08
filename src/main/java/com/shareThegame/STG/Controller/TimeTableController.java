@@ -348,7 +348,7 @@ class TimeTableController {
 
         }
         else {
-            return new JSONObject ( ).put ( "messsage" , "Erorr_Check_The_Correctness" ).toString ( );
+            return new JSONObject ( ).put ( "message" , "Erorr_Check_The_Correctness" ).toString ( );
 
         }
 
