@@ -131,11 +131,11 @@ public class UserController {
                 User userExist=userRepository.findByEmail ( username );
                 userService.changePassword ( userExist,newPassword );
 
-                jsonObject.put ( "message","haslo mzienione  " ) ;
+                jsonObject.put ( "message","PASSWORD_CHANGED" ) ;
             }
             else{
 
-                jsonObject.put ( "message","stare haslo jest bełdne  " ) ;
+                jsonObject.put ( "message","ERROR" ) ;
             }
 
 
@@ -199,8 +199,11 @@ public class UserController {
             }else{
                 jsonObject.put ( "dateofbirth","");
             }
-
-
+            if(user.getPhoto ()!=null) {
+                jsonObject.put ("photo",user.getPhoto () );
+            }else{
+                jsonObject.put ("photo","" );
+            }
         }
         System.out.println (" zwracam usera"+jsonObject.toString () );
         return jsonObject.toString ();
@@ -232,8 +235,28 @@ public class UserController {
             return new JSONObject ( ).put ( "message","UPDATE_ERROR" ).toString ();
         }
     }
+    @PostMapping ( value = "/getPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+    String getPhoto(){
+        User user=userRepository.findByEmail (userAuth () );
+        JSONObject js=new JSONObject (  );
+        js.put ( "photo",user.getPhoto () );
+        return  js.toString ();
 
 
+    }
+    @PostMapping ( value = "/addPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+    String addPhoto(String photo){
+        User user=userRepository.findByEmail (userAuth () );
+        user.setPhoto ( photo );
+        userRepository.save ( user );
+        JSONObject js=new JSONObject (  );
+        js.put ( "photo","add" );
+        return  js.toString ();
+
+
+    }
     @PostMapping(value = "/deleteUser",produces = "application/json",consumes =  "application/x-www-form-urlencoded;charset=UTF-8")
     public @ResponseBody
     String deleteUser(@Valid User user){

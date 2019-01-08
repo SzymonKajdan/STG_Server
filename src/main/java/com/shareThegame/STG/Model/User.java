@@ -157,8 +157,8 @@ class User {
     }
 
     public
-    void setPhoto ( byte[] photo ) {
-        this.photo = photo;
+    void setPhoto ( String photoToConvert ) {
+        this.photo =Base64.getDecoder ( ).decode (photoToConvert  );
     }
 
     public

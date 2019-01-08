@@ -72,7 +72,10 @@ class TimeTableController {
         List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore (sportobjectid,dt1.toDate (),dt.toDate () );
         TimeTable timeTableCheck=timeTableReposiotry.findByRenteridAndStartrentAndEndrend ( user.getId (),postStartRentDate,postEndRentDate );
         if(timeTableCheck!=null&&timeTableCheck.getRenterid ()==user.getId ()){
-            return new JSONObject (  ).put ( "status","lets_pay" ).toString ();
+            PaymentHisotry paymentHisotry=paymentHistoryRepository.findBySportobjectidAndAndStartrentAndExprrent ( timeTableCheck.getSportobjectid (),postStartRentDate,postEndRentDate );
+            jsonObject.put ( "payment_id",paymentHisotry.getId () );
+              jsonObject.put ( "status","lets_pay" );
+              return  jsonObject.toString ();
         }
         Collections.sort ( timeTableList );
         boolean iscorrect = checkCorrectOfRequest ( sportobjectid , postStartRent , postEndRent );
