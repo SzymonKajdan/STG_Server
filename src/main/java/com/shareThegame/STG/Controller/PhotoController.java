@@ -48,39 +48,7 @@ class PhotoController {
         return jsonObject.toString ();
 
     }
-    @PostMapping(value ="/addPhoto",produces = "application/json")
-    public  @ResponseBody
-    String addImg (Long sportobjectid,String photo ){
-        String useremail=userAuth ();
 
-        User user=userRepository.findByEmail ( useremail );
-        SportObject sportObject=sportObjectReposiotry.getOne ( sportobjectid );
-        JSONObject json=new JSONObject (  );
-        if(sportObject!=null&&sportObject.getOwnid ()==user.getId ()) {
-            if(sportObject.getObjectPhotos ().size ()<=12) {
-                ObjectPhotos objectPhoto = new ObjectPhotos ( );
-                objectPhoto.setSportobjectid ( sportobjectid );
-
-
-                byte[] decoded = Base64.getDecoder ( ).decode (photo );
-
-
-                objectPhoto.setPhoto ( decoded );
-                System.out.println (objectPhoto.getPhoto () );
-                objectPhotosRepository.save ( objectPhoto );
-                sportObject.getObjectPhotos ( ).add ( objectPhoto );
-                sportObjectReposiotry.save ( sportObject );
-
-                json.put ( "status" , "ok" );
-                json.put ( "id" , objectPhoto.getId ( ) );
-            }else {
-                json.put ( "status","TO_MANY_PHOTOS" );
-            }
-        }else{
-            json.put ( "status","unauthorized" );
-        }
-        return json.toString ();
-    }
     @PostMapping(value ="/deletePhoto",produces = "application/json")
     public  @ResponseBody
     String deleteImg(Long sportobjectid,long photoid){
