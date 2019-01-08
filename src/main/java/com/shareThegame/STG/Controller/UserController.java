@@ -121,12 +121,13 @@ public class UserController {
 
     @PostMapping ( value = "/resetPassword", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
-    String ResetPassword( @Valid User user,String newPassword ) throws JSONException {
+    String ResetPassword( String newPassword,String oldPassword ) throws JSONException {
         JSONObject jsonObject = new JSONObject ( );
         String username=userAuth ();
-        if(userRepository.findByEmail ( username ).getUsername ().equals (   user.getUsername () )){
+        User user=userRepository.findByEmail ( username );
+
            // User userExist = userRepository.findByEmail ( username).getPassword ();
-            if(userService.comaprePassword ( userRepository.findByEmail ( username).getPassword (),user.getPassword () )){
+            if(userService.comaprePassword (user.getPassword (),oldPassword)){
                 User userExist=userRepository.findByEmail ( username );
                 userService.changePassword ( userExist,newPassword );
 
@@ -137,10 +138,8 @@ public class UserController {
                 jsonObject.put ( "message","stare haslo jest bełdne  " ) ;
             }
 
-        }
-        else{
-            jsonObject.put ( "message","cos poszlo nie tak " ) ;
-        }
+
+
 
         return jsonObject.toString ( );
     }
