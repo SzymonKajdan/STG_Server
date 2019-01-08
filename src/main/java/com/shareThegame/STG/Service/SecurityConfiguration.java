@@ -79,6 +79,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("addObject").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests ().antMatchers ( "/deleteObject" ).hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/addPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
+        http.authorizeRequests().antMatchers("/getPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
         http.authorizeRequests().antMatchers("/ReserveHall").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/ChangeReservation").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/DeleteReservation").hasAnyAuthority("CLIENT").and ().httpBasic ();
