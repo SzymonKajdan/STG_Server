@@ -47,8 +47,9 @@ class TimeTableController {
 
 
 
+        String username = userAuth ( );
 
-
+        User user = userRepository.findByEmail ( username );
         DateTime postStartRent;
         DateTime postEndRent;
         boolean isFree = true;
@@ -69,6 +70,10 @@ class TimeTableController {
                 .withMinuteOfHour(0)
                 .withSecondOfMinute(0).withMillisOfSecond ( 0 );
         List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore (sportobjectid,dt1.toDate (),dt.toDate () );
+        TimeTable timeTableCheck=timeTableReposiotry.findByRenteridAndStartrentAndEndrend ( user.getId (),postStartRentDate,postEndRentDate );
+        if(timeTableCheck!=null&&timeTableCheck.getRenterid ()==user.getId ()){
+            return new JSONObject (  ).put ( "status","lets_pay" ).toString ();
+        }
         Collections.sort ( timeTableList );
         boolean iscorrect = checkCorrectOfRequest ( sportobjectid , postStartRent , postEndRent );
         if ( iscorrect == true ) {
@@ -91,14 +96,14 @@ class TimeTableController {
                 jsonObject.put ( "status" , "SPORTOBJECT_IS_NOT_AVALAVILE" );
             }
             else {
-                String username = userAuth ( );
+
 
                 isFree = true;
 
 
-                User user = userRepository.findByEmail ( username );
+
                 SportObject sportObject = sportObjectReposiotry.getOne ( sportobjectid);
-                boolean status=statusOfPayment;
+              //  boolean status=statusOfPayment;
 
                 TimeTable timeTable=new TimeTable ();
                 timeTable.setSportobjectid ( sportobjectid );
@@ -116,7 +121,7 @@ class TimeTableController {
                 PaymentHisotry paymentHisotry = new PaymentHisotry ( );
                 paymentHisotry.setStartrent ( postStartRent.toDate ( ) );
                 paymentHisotry.setExprrent ( postEndRent.toDate ( ) );
-                paymentHisotry.setStautsofpayment ( status );
+                paymentHisotry.setStautsofpayment ( false );
                 paymentHisotry.setSportobjectid ( sportObject.getId ( ) );
                 paymentHisotry.setUserid ( user.getId ( ) );
                 paymentHisotry.setSportObject ( sportObject );
@@ -325,10 +330,8 @@ class TimeTableController {
 
         TimeTable timeTableToDelete = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( startToDelete , endToDelete , sportobjectid );
         if ( timeTableToDelete != null ) {
-            if ( startToDelete.before ( new Date ( ) ) ) {
-                return new JSONObject ( ).put ( "messsage" , "Erorr_Check_The_Correctness" ).toString ( );
-            }
-            else {
+
+
                 if ( user.getId ( ) != timeTableToDelete.getRenterid ( ) ) {
 
                     return new JSONObject ( ).put ( "message" , "SERVER_ERROR" ).toString ( );
@@ -340,7 +343,7 @@ class TimeTableController {
                 }
 
 
-            }
+
 
 
         }

@@ -13,6 +13,7 @@ import java.util.List;
 public interface TimeTableReposiotry extends JpaRepository<TimeTable,Long> {
     TimeTable findBySportobjectid(Long sportobjectid);
     ArrayList<TimeTable> findAllBySportobjectid( Long sportobjectid);
+    TimeTable findByRenteridAndStartrentAndEndrend(Long retnerid, Date startrent,Date endrent);
     TimeTable  findByStartrentAndEndrendAndSportobjectid( Date startrent,Date endrent,Long sportobjectid );
     List<TimeTable> findAllBysportobjectid(Long sportobjectid);
     List<TimeTable>findAllByRenterid(Long renterid);
