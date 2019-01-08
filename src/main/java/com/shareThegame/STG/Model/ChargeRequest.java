@@ -13,17 +13,6 @@ public class ChargeRequest {
     private String description;
     private int amount;
 
-    public
-    int getPaymentid ( ) {
-        return paymentid;
-    }
-
-    public
-    void setPaymentid ( int paymentid ) {
-        this.paymentid = paymentid;
-    }
-
-    private  int paymentid;
     private Currency currency;
     private String stripeEmail;
     private String stripeToken;

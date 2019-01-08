@@ -43,7 +43,7 @@ class TimeTableController {
 
     @PostMapping ( value = "/ReserveHall", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
-    String reserve ( Long sportobjectid , String end , String start ,String statusOfPayment) throws ParseException {
+    String reserve ( Long sportobjectid , String end , String start ,boolean statusOfPayment) throws ParseException {
 
 
 
@@ -98,7 +98,7 @@ class TimeTableController {
 
                 User user = userRepository.findByEmail ( username );
                 SportObject sportObject = sportObjectReposiotry.getOne ( sportobjectid);
-                boolean status=chceckStatus ( statusOfPayment );
+                boolean status=statusOfPayment;
 
                 TimeTable timeTable=new TimeTable ();
                 timeTable.setSportobjectid ( sportobjectid );
@@ -351,32 +351,7 @@ class TimeTableController {
 
 
     }
-    @PostMapping ( value = "/getAllUserReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
-    public @ResponseBody
-    String getAllUserReserv(){
-        String useremail=userAuth ();
-        User user=userRepository.findByEmail ( useremail );
-        List<TimeTable>timeTableList=timeTableReposiotry.findAllByRenterid ( user.getId () );
-        JSONArray jsonObject=new JSONArray (  );
-        for(TimeTable timeTable:timeTableList){
-            Map<String,Object> map=new HashMap <> (  );
-            JSONObject js=new JSONObject (  );
-            DateTime d1=new DateTime ( timeTable.getStartrent () );
-            DateTime d2=new DateTime ( timeTable.getEndrend () );
-            js.put ( "facilityid", timeTable.getSportobjectid ());
 
-            js.put ( "start",timeTable.getStartrent () );
-            js.put ( "end",timeTable.getEndrend () );
-
-            //js.put ( "hourend",d2.getHourOfDay ()+":"+d2.getMinuteOfHour () );
-            js.put ( "price",timeTable.getPrice () );
-            jsonObject.put ( js );
-        }
-        return jsonObject.toString ( );
-
-
-
-    }
     private
     void deleteReserv ( TimeTable timeTableToDelete , User user ) {
 
@@ -601,13 +576,5 @@ class TimeTableController {
         interval.add ( close );
         return interval;
     }
-    private
-    boolean chceckStatus(String status){
-        if(status.equals ( "true" )){
-            return  true;
-        }else{
-            return false;
 
-        }
-    }
 }

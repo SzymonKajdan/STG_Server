@@ -20,6 +20,8 @@ interface PaymentHistoryRepository extends JpaRepository<PaymentHisotry,Long> {
     List<PaymentHisotry>findAllBySportobjectid(Long sportobjectid);
     List<PaymentHisotry>findAllByUser( User user);
     List<PaymentHisotry>findAllByUserid(Long userid);
+    List<PaymentHisotry>findAllByUseridAndStartrentBefore(Long userid,Date startrent);
+    List<PaymentHisotry>findAllByUseridAndStartrentAfter(Long userid,Date startrent);
     List<PaymentHisotry>findAllBySportObject( SportObject sportObject );
    // List<User>findAllBySportobjectid(Long sportobjectid);
 }

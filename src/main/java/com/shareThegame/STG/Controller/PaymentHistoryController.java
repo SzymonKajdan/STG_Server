@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,32 +28,56 @@ class PaymentHistoryController {
     @Autowired
     PaymentHistoryRepository paymentHistoryRepository;
 
-    @PostMapping ( value = "/getUserPaymentHistory", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
-    public @ResponseBody
-    String  getUserPaymentHistory(long sportobjectid){
-        String useremail=userAuth ();
-        User user=userRepository.findByEmail ( useremail );
-        List<PaymentHisotry> paymentHisotryList=paymentHistoryRepository.findAllByUserid ( user.getId () );
-        JSONArray jsonObject=new JSONArray (  );
-        for(PaymentHisotry it:paymentHisotryList){
-            Map<String,Object> sportObjectMap = new HashMap<> ();
-            sportObjectMap.put ( "exprrent",it.getExprrent () );
-            sportObjectMap.put ( "cost",it.getCost () );
-            sportObjectMap.put ( "startrent",it.getStartrent () );
-            sportObjectMap.put ( "sportobjectid",it.getSportobjectid () );
-            sportObjectMap.put ( "id",it.getId () );
-            JSONArray tmp=new JSONArray ( );
-            tmp.put (sportObjectMap );
-            jsonObject.put (  sportObjectMap);
 
-        }
+           @PostMapping ( value = "/getActiveReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+        public @ResponseBody
+        String  getActiveReserv(){
+            String useremail=userAuth ();
+            User user=userRepository.findByEmail ( useremail );
+            List<PaymentHisotry> paymentHisotryList=paymentHistoryRepository.findAllByUseridAndStartrentAfter ( user.getId (),new Date (  ) );
+            JSONArray jsonObject=new JSONArray (  );
+            for(PaymentHisotry it:paymentHisotryList){
+                Map<String,Object> sportObjectMap = new HashMap<> ();
+                sportObjectMap.put ( "exprrent",it.getExprrent () );
+                sportObjectMap.put ( "cost",it.getCost () );
+                sportObjectMap.put ( "startrent",it.getStartrent () );
+                sportObjectMap.put ( "sportobjectid",it.getSportobjectid () );
+                sportObjectMap.put ( "statusOfPaymnet",it.isStautsofpayment () );
+                sportObjectMap.put ( "id",it.getId () );
+                JSONArray tmp=new JSONArray ( );
+                tmp.put (sportObjectMap );
+                jsonObject.put (  sportObjectMap);
 
-       // jsonObject.put ( paymentHisotryList );
+            }
+
+        // jsonObject.put ( paymentHisotryList );
         return jsonObject.toString ();
 
 
     }
-    String userAuth () {
+    @PostMapping ( value = "/getHistoryReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    public @ResponseBody
+    String  getHistoryReserv() {
+        String useremail = userAuth ( );
+        User user = userRepository.findByEmail ( useremail );
+        List <PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllByUseridAndStartrentBefore ( user.getId ( ) , new Date ( ) );
+        JSONArray jsonObject = new JSONArray ( );
+        for (PaymentHisotry it : paymentHisotryList) {
+            Map <String, Object> sportObjectMap = new HashMap <> ( );
+            sportObjectMap.put ( "exprrent" , it.getExprrent ( ) );
+            sportObjectMap.put ( "cost" , it.getCost ( ) );
+            sportObjectMap.put ( "startrent" , it.getStartrent ( ) );
+            sportObjectMap.put ( "statusOfPaymnet",it.isStautsofpayment () );
+            sportObjectMap.put ( "sportobjectid" , it.getSportobjectid ( ) );
+            sportObjectMap.put ( "id" , it.getId ( ) );
+            JSONArray tmp = new JSONArray ( );
+            tmp.put ( sportObjectMap );
+            jsonObject.put ( sportObjectMap );
+
+        }
+        return  jsonObject.toString ();
+    }
+        String userAuth () {
 
 
         String username;
