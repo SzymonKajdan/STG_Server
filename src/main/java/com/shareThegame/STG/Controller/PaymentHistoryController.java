@@ -13,10 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public
@@ -35,6 +32,7 @@ class PaymentHistoryController {
             String useremail=userAuth ();
             User user=userRepository.findByEmail ( useremail );
             List<PaymentHisotry> paymentHisotryList=paymentHistoryRepository.findAllByUseridAndStartrentAfter ( user.getId (),new Date (  ) );
+               Collections.sort ( paymentHisotryList );
             JSONArray jsonObject=new JSONArray (  );
             for(PaymentHisotry it:paymentHisotryList){
                 Map<String,Object> sportObjectMap = new HashMap<> ();
@@ -61,6 +59,7 @@ class PaymentHistoryController {
         String useremail = userAuth ( );
         User user = userRepository.findByEmail ( useremail );
         List <PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllByUseridAndStartrentBefore ( user.getId ( ) , new Date ( ) );
+        Collections.sort ( paymentHisotryList );
         JSONArray jsonObject = new JSONArray ( );
         for (PaymentHisotry it : paymentHisotryList) {
             Map <String, Object> sportObjectMap = new HashMap <> ( );

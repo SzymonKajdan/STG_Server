@@ -13,7 +13,7 @@ import java.util.Date;
 @Entity
 public
 
-class PaymentHisotry {
+class PaymentHisotry implements  Comparable<PaymentHisotry>{
 
 
     @Id
@@ -127,6 +127,12 @@ class PaymentHisotry {
 
 
 
-
-
+    @Override
+    public
+    int compareTo ( PaymentHisotry o ) {
+         if (getStartrent () == null || o.getStartrent () == null) {
+            return 0;
+        }
+        return getStartrent ().compareTo(o.getStartrent ());
+    }
 }
