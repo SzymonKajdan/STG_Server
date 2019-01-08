@@ -153,7 +153,12 @@ class User {
 
     public
     String getPhoto ( ) {
-        return Base64.getEncoder ( ).encodeToString ( photo );
+        if(photo==null){
+            return"";
+        }
+        else {
+            return Base64.getEncoder ( ).encodeToString ( photo );
+        }
     }
 
     public
