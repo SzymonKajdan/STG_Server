@@ -35,7 +35,7 @@ class User {
     private String dateofbirth;
 
     private int active;
-
+    @Lob
     private byte[] photo;
 
     @ManyToMany
@@ -151,21 +151,19 @@ class User {
     }
 
 
-    public
-    String getPhoto ( ) {
-        if(photo==null){
-            return"";
-        }
-        else {
-            return Base64.getEncoder ( ).encodeToString ( photo );
-        }
+   public
+   String getPhoto ( ) {
+     return Base64.getEncoder().encodeToString(photo);
     }
 
     public
     void setPhoto ( String photoToConvert ) {
         this.photo =Base64.getDecoder ( ).decode (photoToConvert  );
     }
-
+//    public
+//    void setPhoto ( byte[]photo ) {
+//        this.photo =photo;
+//    }
     public
     List <FavouriteObjects> getFavouriteObjects ( ) {
         return favouriteObjects;

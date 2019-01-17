@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.HashMap;
@@ -31,9 +32,12 @@ class ObjectStarsController {
     @Autowired
     SportObjectReposiotry sportObjectReposiotry;
 
-    @PostMapping ( value = "/addMark", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/addMark", produces = "application/json")
     public @ResponseBody
-    String addMark(Long sportobjectid ,long mark) throws JsonProcessingException, JSONException {
+    String addMark (@RequestBody  String jsonData ) throws JsonProcessingException, JSONException {
+
+        Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
+        Long mark=Long.valueOf ( new JSONObject ( jsonData ).get ( "mark" ).toString () );
         User user=userRepository.findByEmail ( userAuth () );
         ObjectStars objectStars=objectStarsRepository.findBySportobjectidAndUserid ( sportobjectid,user.getId () );
         if(objectStars==null){

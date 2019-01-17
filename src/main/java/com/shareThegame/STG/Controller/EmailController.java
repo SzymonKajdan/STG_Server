@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -29,10 +30,10 @@ import org.thymeleaf.context.Context;
         @Autowired
         UserService userService;
 
-        @PostMapping (value = "/rememberPassword" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+        @PostMapping (value = "/rememberPassword" ,produces = "application/json")
         public @ResponseBody
-      String rememberPassword( String email ) {
-            User user= userRepository.findByEmail ( email );
+      String rememberPassword (@RequestBody String email ) {
+            User user= userRepository.findByEmail ( new JSONObject ( email ).get ( "email" ).toString () );
             System.out.println (user );
             if(user!=null) {
                 Context context = new Context ( );

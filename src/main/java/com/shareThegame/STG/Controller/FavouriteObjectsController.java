@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
@@ -31,10 +32,11 @@ class FavouriteObjectsController {
     @Autowired
     SportObjectReposiotry sportObjectReposiotry;
 
-    @PostMapping (value = "/addObjectToFav" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @PostMapping (value = "/addObjectToFav" ,produces = "application/json")
     public @ResponseBody
-    String addObjectToFav(Long sportobjectid){
+    String addObjectToFav( @RequestBody String jsonData ){
         User user=userRepository.findByEmail ( userAuth () );
+        Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
         System.out.println ("user id "+user.getId ()+ " sport object id "+sportobjectid );
         if(user!=null){
 

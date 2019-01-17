@@ -71,32 +71,39 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/resetPassword").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/updateProfile").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/deleteUser").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        //sportobject
 
         http.authorizeRequests().antMatchers("/updateObject").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("addNewObject").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("getAllObjects").permitAll();
-
-        http.authorizeRequests().antMatchers("addObject").hasAnyAuthority("CLIENT").and ().httpBasic ();
+        //http.authorizeRequests().antMatchers("addObject").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests ().antMatchers ( "/deleteObject" ).hasAnyAuthority("CLIENT").and ().httpBasic ();
-        http.authorizeRequests().antMatchers("/addPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
-        http.authorizeRequests().antMatchers("/getPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
+
+        //schedule
         http.authorizeRequests().antMatchers("/ReserveHall").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/ChangeReservation").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/DeleteReservation").hasAnyAuthority("CLIENT").and ().httpBasic ();
-
         http.authorizeRequests().antMatchers("/returnTimetableOfSportObject").permitAll();
+        http.authorizeRequests ().antMatchers ( "/getActiveReserv" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
+        http.authorizeRequests ().antMatchers ( "/getHistoryReserv" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
+
+        //notimpledet or not working
+        http.authorizeRequests().antMatchers("/addPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
+        http.authorizeRequests().antMatchers("/getPhoto").hasAnyAuthority("CLIENT").and ().httpBasic () ;
+        http.authorizeRequests ().antMatchers ( "/deletePhoto" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
+
+
+        //Fav
         http.authorizeRequests().antMatchers("/addObjectToFav").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/getFavorites").hasAnyAuthority("CLIENT").and ().httpBasic ();
         http.authorizeRequests().antMatchers("/deleteFromFavorites").hasAnyAuthority("CLIENT").and ().httpBasic ();
-
+    //mark
         http.authorizeRequests ().antMatchers ( "/addMark" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
-        http.authorizeRequests ().antMatchers ( "/deletePhoto" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
-        http.authorizeRequests ().antMatchers ( "/getActiveReserv" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
 
-        http.authorizeRequests ().antMatchers ( "/getHistoryReserv" ).hasAnyAuthority ( "CLIENT" ).and ().httpBasic ();
+
 
     }
     @Override

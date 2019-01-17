@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,7 +50,7 @@ class SportObjectController {
     @Autowired
     OpenHoursRepository openHoursRepository;
 
-    @PostMapping ( value = "/addNewObject", produces = "application/json",consumes="application/json" )
+    @PostMapping ( value = "/addNewObject", produces = "application/json" )
     public @ResponseBody
     String addNewObject ( @RequestBody String  object){
         String useremail=userAuth ();
@@ -108,7 +109,7 @@ class SportObjectController {
     }
 
 
-    @PostMapping(value = "/getAllObjects", produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @GetMapping (value = "/getAllObjects", produces = "application/json")
     public @ResponseBody
     String getAllObjects(){
         JSONArray jsonObject=new JSONArray (  );
@@ -174,7 +175,7 @@ class SportObjectController {
     int boolToInt(boolean b) {
         return Boolean.compare(b, false);
     }
-    @PostMapping(value = "/addObject" ,produces = "application/json")
+   /* @PostMapping(value = "/addObject" ,produces = "application/json")
     public @ResponseBody
     String addObject( @Valid SportObject sportObject,@Valid ObjectExtras objectExtras,@Valid OpenHours openHours ){
         String useremial;
@@ -240,28 +241,31 @@ class SportObjectController {
 
 
     }
-    @PostMapping(value = "/deleteObject" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    */
+    @PostMapping(value = "/deleteObject" ,produces = "application/json")
     public @ResponseBody
-    String deleteObject( @Valid SportObject sportObject ){
+    String deleteObject( @RequestBody String jsonData ){
+
+        Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
         String useremial=userAuth ();
         User user=userRepository.findByEmail ( useremial );
-        SportObject sportObjectToDelete = sportObjectReposiotry.getOne ( sportObject.getId ( ) );
+        SportObject sportObjectToDelete = sportObjectReposiotry.getOne ( sportobjectid );
         if(sportObjectToDelete.getOwnid ()==user.getId ()&&sportObjectToDelete!=null) {
 
-            List<PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllBySportobjectid    ( sportObject.getId ( ) );
-            List<ObjectPhotos> objectPhotosToDelete=objectPhotosRepository.findAllBySportobjectid ( sportObject.getId () );
-            List<ObjectStars>objectStarsListToDelete=objectStarsRepository.findAllBySportobjectid ( sportObject.getId () );
-            ObjectExtras objectExtrasToDelete= objectExstrasRepository.findBySportobjectid ( sportObject.getId () );
-            List<TimeTable>timeTableListToDelete=timeTableReposiotry.findAllBySportobjectid ( sportObject.getId () );
-            VisibilityObject visibilityObjectToDelete=visvilityObjectRepository.findBySportobjectid ( sportObject.getId () );
-            OpenHours openHoursToDelete=openHoursRepository.findBySportobjectid ( sportObject.getId () );
+            List<PaymentHisotry> paymentHisotryList = paymentHistoryRepository.findAllBySportobjectid    (sportobjectid );
+            List<ObjectPhotos> objectPhotosToDelete=objectPhotosRepository.findAllBySportobjectid ( sportobjectid );
+            List<ObjectStars>objectStarsListToDelete=objectStarsRepository.findAllBySportobjectid ( sportobjectid );
+            ObjectExtras objectExtrasToDelete= objectExstrasRepository.findBySportobjectid ( sportobjectid );
+            List<TimeTable>timeTableListToDelete=timeTableReposiotry.findAllBySportobjectid ( sportobjectid );
+            VisibilityObject visibilityObjectToDelete=visvilityObjectRepository.findBySportobjectid ( sportobjectid );
+            OpenHours openHoursToDelete=openHoursRepository.findBySportobjectid ( sportobjectid );
 
             if(paymentHisotryList.size ()!=0){
             sportObjectToDelete.getPaymentHisotries ().removeAll ( paymentHisotryList );
 
             for(PaymentHisotry p:paymentHisotryList){
                 User tmpuser=userRepository.getOne ( p.getUserid () );
-                tmpuser.getPaymentHisotries ().removeAll ( paymentHistoryRepository.findAllBySportobjectid ( sportObject.getId () ) );
+                tmpuser.getPaymentHisotries ().removeAll ( paymentHistoryRepository.findAllBySportobjectid ( sportobjectid ) );
             }
            paymentHistoryRepository.deleteAll (paymentHisotryList);
 
@@ -307,7 +311,7 @@ class SportObjectController {
             }
 
     }
-    @PostMapping(value = "/updateObject" ,produces = "application/json",consumes = "application/json")
+    @PostMapping(value = "/updateObject" ,produces = "application/json")
     public @ResponseBody
     String updateObject(@RequestBody String  object){
         String usermail=userAuth ();

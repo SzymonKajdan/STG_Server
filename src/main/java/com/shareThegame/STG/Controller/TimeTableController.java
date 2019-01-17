@@ -10,7 +10,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.time.LocalDate;
@@ -41,26 +43,31 @@ class TimeTableController {
 
 
 
-    @PostMapping ( value = "/ReserveHall", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/ReserveHall", produces = "application/json")
     public @ResponseBody
-    String reserve ( Long sportobjectid , String end , String start ,boolean statusOfPayment) throws ParseException {
+    String reserve ( @RequestBody String jsonData ) throws ParseException {
 
-
+        JSONObject jsonObject = new JSONObject ( );
 
         String username = userAuth ( );
 
         User user = userRepository.findByEmail ( username );
         DateTime postStartRent;
         DateTime postEndRent;
+
+        Long sportobjectid=Long.valueOf (  new JSONObject ( jsonData ).get ( "sportobjectid" ).toString ());
         boolean isFree = true;
 
-        postStartRent = pasreDate ( start );
+
+
+        postStartRent = pasreDate ( new JSONObject ( jsonData ).get ( "start" ).toString () );
         Date postStartRentDate = postStartRent.toDate ( );
 
 
-        postEndRent = pasreDate ( end );
+        postEndRent = pasreDate ( new JSONObject ( jsonData ).get ( "end" ).toString () );
         Date postEndRentDate = postEndRent.toDate ( );
-        JSONObject jsonObject = new JSONObject ( );
+
+
         DateTime dt = new DateTime().withYear ( postEndRent.getYear () ).withDayOfMonth ( postEndRent.getDayOfMonth () ).withMonthOfYear ( postEndRent.getMonthOfYear () )
                 .withHourOfDay(23)
                 .withMinuteOfHour(59)
@@ -144,6 +151,7 @@ class TimeTableController {
 
                 jsonObject.put ( "status" , "RESERVATION_CONFRIMED" );
                 jsonObject.put ( "payment_id",paymentHisotry.getId () );
+                jsonObject.put ( "id",timeTable.getId () ) ;
             }
         }
         else {
@@ -153,11 +161,16 @@ class TimeTableController {
 
     }
 
-    @PostMapping ( value = "/returnTimetableOfSportObject", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @GetMapping ( value = "/returnTimetableOfSportObject", produces = "application/json" )
     public @ResponseBody
-    String returnTimetableOfSportObject ( Long sportobjectid , String day , String dayend ) {
-        DateTime start = pasreDate ( day );
-        DateTime end = pasreDate ( dayend );
+    String returnTimetableOfSportObject ( @RequestBody String  jsonData ) {
+
+
+
+        DateTime start = pasreDate ( new JSONObject (  jsonData ).get ( "start" ).toString () );
+        DateTime end = pasreDate ( new JSONObject ( jsonData ).get ( "end" ).toString () );
+        Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
+
         System.out.println ( "reguset o termianrz" );
         List <TimeTable> timeTableList = timeTableReposiotry.findAllBySportobjectidAndStartrentAfterAndEndrendBefore ( sportobjectid , start.toDate ( ) , end.toDate ( ) );
         SportObject sp = sportObjectReposiotry.getOne ( sportobjectid );
@@ -207,7 +220,7 @@ class TimeTableController {
         jsonObject.put ( "schedule" , timetabletoreturn );
         return jsonObject.toString ( );
     }
-
+    /*
     @PostMapping ( value = "/ChangeReservation", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
     String changeReservation ( Long sportobjectid , String end , String start , String newstart , String newend ) {
@@ -322,16 +335,15 @@ class TimeTableController {
         }
         return jsonObject.toString ( );
     }
-
-    @PostMapping ( value = "/DeleteReservation", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+*/
+    @PostMapping ( value = "/DeleteReservation", produces = "application/json" )
     public @ResponseBody
-    String deleteReservation ( Long sportobjectid , String startReservationToDelete , String endReservationToDelete ) {
+    String deleteReservation ( @RequestBody String jsonData ) {
         String useremial = userAuth ( );
         User user = userRepository.findByEmail ( useremial );
-        Date startToDelete = pasreDate ( startReservationToDelete ).toDate ( );
-        Date endToDelete = pasreDate ( endReservationToDelete ).toDate ( );
-
-        TimeTable timeTableToDelete = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( startToDelete , endToDelete , sportobjectid );
+        Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
+        Long id=Long.valueOf ( new JSONObject ( jsonData ).get ( "id" ).toString () );
+        TimeTable timeTableToDelete = timeTableReposiotry.findBySportobjectidAndId ( sportobjectid,id );
         if ( timeTableToDelete != null ) {
 
 

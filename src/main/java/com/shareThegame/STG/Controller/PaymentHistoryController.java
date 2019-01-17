@@ -26,7 +26,7 @@ class PaymentHistoryController {
     PaymentHistoryRepository paymentHistoryRepository;
 
 
-           @PostMapping ( value = "/getActiveReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+           @PostMapping ( value = "/getActiveReserv", produces = "application/json")
         public @ResponseBody
         String  getActiveReserv(){
             String useremail=userAuth ();
@@ -53,7 +53,7 @@ class PaymentHistoryController {
 
 
     }
-    @PostMapping ( value = "/getHistoryReserv", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/getHistoryReserv", produces = "application/json" )
     public @ResponseBody
     String  getHistoryReserv() {
         String useremail = userAuth ( );

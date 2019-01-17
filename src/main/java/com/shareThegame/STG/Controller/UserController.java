@@ -1,6 +1,7 @@
 package com.shareThegame.STG.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.Gson;
 import com.shareThegame.STG.Model.*;
 import com.shareThegame.STG.Repository.*;
 import com.shareThegame.STG.Service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,12 +55,16 @@ public class UserController {
     private
     OpenHoursRepository openHoursRepository;
 
-    @PostMapping ( value = "/register", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/register", produces = "application/json" )
     public @ResponseBody
-    String register ( @Valid User user ) throws JSONException {
+    String register (  @RequestBody String  postUser) throws JSONException {
+
+        JSONObject userJson=new JSONObject (postUser  );
+        User user=userParse ( userJson );
 
 
         JSONObject jsonObject = new JSONObject ( );
+
         if ( user != null && user.getUsername ( ) != null && user.getPassword ( ) != null ) {
             if ( user.getUsername ( ).length ( ) >= 5 && user.getPassword ( ).length ( ) >= 5 ) {
 
@@ -90,9 +96,14 @@ public class UserController {
         return jsonObject.toString ( );
     }
 
-    @PostMapping ( value = "/login", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/login", produces = "application/json" )
     public @ResponseBody
-    String logIn ( @Valid User user ) throws JSONException {
+    String logIn ( @RequestBody String jsonData ) throws JSONException {
+
+        System.out.println (jsonData );
+        User user=userParse (  new JSONObject (   jsonData) );
+
+
         JSONObject jsonObject = new JSONObject ( );
         String username = userAuth ( );
 
@@ -119,9 +130,14 @@ public class UserController {
 
     }
 
-    @PostMapping ( value = "/resetPassword", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/resetPassword", produces = "application/json" )
     public @ResponseBody
-    String ResetPassword( String newPassword,String oldPassword ) throws JSONException {
+    String ResetPassword( @RequestBody String data) throws JSONException {
+
+        JSONObject post=new JSONObject ( data );
+        String oldPassword=post.get ( "oldPassword" ).toString ();
+        String newPassword=post.get ( "newPassword" ).toString ();
+
         JSONObject jsonObject = new JSONObject ( );
         String username=userAuth ();
         User user=userRepository.findByEmail ( username );
@@ -147,7 +163,7 @@ public class UserController {
 
 
 
-    @PostMapping ( value = "/getUser", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/getUser", produces = "application/json" )
     @ResponseBody public
     String giveBackUser(  ) throws JSONException, JsonProcessingException {
         System.out.println (" zwracam usera" );
@@ -199,11 +215,8 @@ public class UserController {
             }else{
                 jsonObject.put ( "dateofbirth","");
             }
-            if(user.getPhoto ()!=null) {
-                jsonObject.put ("photo",user.getPhoto () );
-            }else{
-                jsonObject.put ("photo","" );
-            }
+            jsonObject.put ( "photo",user.getPhoto () );
+
         }
         System.out.println (" zwracam usera"+jsonObject.toString () );
         return jsonObject.toString ();
@@ -212,9 +225,11 @@ public class UserController {
 
 
     }
-    @PostMapping ( value = "/updateProfile", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/updateProfile", produces = "application/json" )
     public @ResponseBody
-    String updateProfile(@Valid User user){
+    String updateProfile(@RequestBody String jsonData){
+        User user=userParse ( new JSONObject (  jsonData) );
+
         String useremail=userAuth ();
         User userToUpdate=userRepository.findByEmail ( useremail );
         if(userToUpdate!=null) {
@@ -225,7 +240,20 @@ public class UserController {
             userToUpdate.setFirstname ( user.getFirstname ( ) );
             userToUpdate.setLastname ( user.getLastname ( ) );
             userToUpdate.setPhoneno ( user.getPhoneno ( ) );
-            userToUpdate.setUsername ( user.getUsername () );
+
+                if ( userToUpdate.getUsername ().equals ( user.getUsername () ) ) {
+                    userToUpdate.setUsername ( user.getUsername ( ) );
+                }
+                else{
+                    if(userRepository.findByUsername ( user.getUsername () )==null){
+                        userToUpdate.setUsername ( user.getUsername () );
+                    }
+                    else {
+                        return new JSONObject ( ).put ( "message" , "UPDATE_ERROR" ).toString ( );
+                    }
+                }
+
+
 //        toUpdate.setPhoto (  Base64.decodeBase64(user.getPhoto ()) );
             userRepository.save ( userToUpdate );
 
@@ -235,12 +263,12 @@ public class UserController {
             return new JSONObject ( ).put ( "message","UPDATE_ERROR" ).toString ();
         }
     }
-    @PostMapping ( value = "/getPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+/*    @PostMapping ( value = "/getPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     public @ResponseBody
     String getPhoto(){
         User user=userRepository.findByEmail (userAuth () );
         JSONObject js=new JSONObject (  );
-        js.put ( "photo",user.getPhoto () );
+       // js.put ( "photo",user.getPhoto () );
         return  js.toString ();
 
 
@@ -256,10 +284,10 @@ public class UserController {
         return  js.toString ();
 
 
-    }
-    @PostMapping(value = "/deleteUser",produces = "application/json",consumes =  "application/x-www-form-urlencoded;charset=UTF-8")
+    }*/
+    @PostMapping(value = "/deleteUser",produces = "application/json")
     public @ResponseBody
-    String deleteUser(@Valid User user){
+    String deleteUser(){
         String useremail=userAuth ();
         User userToDelete=userRepository.findByEmail ( useremail );
 
@@ -418,6 +446,13 @@ public class UserController {
         } else {
             return false;
         }
+    }
+
+    private User userParse(JSONObject userToParse){
+
+        Gson g=new Gson ();
+        User obj=g.fromJson (userToParse.toString (),User.class  );
+        return obj;
     }
 }
 
