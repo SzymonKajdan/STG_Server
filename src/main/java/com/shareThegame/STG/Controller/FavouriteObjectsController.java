@@ -63,7 +63,7 @@ class FavouriteObjectsController {
         }
 
     }
-    @PostMapping (value = "/getFavorites" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
+    @PostMapping (value = "/getFavorites" ,produces = "application/json")
     public @ResponseBody
     String getFavorites(){
         User user=userRepository.findByEmail ( userAuth () );
