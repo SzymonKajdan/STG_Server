@@ -273,7 +273,7 @@ public class UserController {
             return new JSONObject ( ).put ( "message","UPDATE_ERROR" ).toString ();
         }
     }
-    @PostMapping ( value = "/getPhoto", produces = "application/json" )
+    @GetMapping ( value = "/getPhoto", produces = "application/json" )
     public @ResponseBody
     String getPhoto(){
         User user=userRepository.findByEmail (userAuth () );
