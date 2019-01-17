@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
@@ -25,12 +26,15 @@ public class ChargeController {
 
     @PostMapping ( value = "/charge", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
     @ResponseBody
-    public String charge ( ChargeRequest chargeRequest ,String price,String id)
-            throws StripeException {
+    public String charge ( @RequestBody String  object )throws StripeException {
+        JSONObject js=new JSONObject ( object );
+        ChargeRequest chargeRequest=new ChargeRequest ();
+        chargeRequest.setStripeToken ( js.get("stripeToken").toString () );
+        chargeRequest.setStripeToken ( js.get ( "stripeEmail" ).toString () );
         JSONObject json = new JSONObject ();
         System.out.println ("charge " );
-        System.out.println (price );
-        chargeRequest.setAmount ( Integer.valueOf (  price) );
+        //Sym.out.println (price );
+        chargeRequest.setAmount ( Integer.valueOf (  js.get ( "price" ).toString ()) );
         chargeRequest.setDescription("Opłata za rezerwacje nr ");
         chargeRequest.setCurrency(ChargeRequest.Currency.PLN);
         chargeRequest.setAmount(chargeRequest.getAmount ()*10*10);
@@ -38,7 +42,7 @@ public class ChargeController {
         Charge charge = paymentsService.charge ( chargeRequest );
         if(charge.getStatus ().equals ( "succeeded" ))
         {
-            PaymentHisotry paymentHistory=paymentHistoryRepository.getOne ( Long.valueOf ( id ) ) ;
+            PaymentHisotry paymentHistory=paymentHistoryRepository.getOne ( Long.valueOf ( js.get ( "id" ).toString () ) ) ;
             paymentHistory.setStautsofpayment ( true );
             paymentHistoryRepository.save ( paymentHistory );
         }
@@ -53,4 +57,8 @@ public class ChargeController {
         jsonObject.put("error", ex.getMessage());
         return jsonObject.toString ();
     }
+
+
+
+
 }

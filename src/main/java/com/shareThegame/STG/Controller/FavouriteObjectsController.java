@@ -91,13 +91,14 @@ class FavouriteObjectsController {
     }
     @PostMapping (value = "/deleteFromFavorites" ,produces = "application/json",consumes = "application/x-www-form-urlencoded;charset=UTF-8")
     public @ResponseBody
-    String deleteFromFavorites(Long sportobjectid){
+    String deleteFromFavorites(@RequestBody String object){
+        JSONObject js=new JSONObject ( object );
         User user=userRepository.findByEmail ( userAuth () );
         List<FavouriteObjects> favouriteObjectsList=user.getFavouriteObjects ();
         long id=0;
         FavouriteObjects favouriteObjects=new FavouriteObjects ();
         for(FavouriteObjects item:favouriteObjectsList){
-            if(item.getSportobjectid ()==sportobjectid){
+            if(item.getSportobjectid ()==Long.valueOf ( js.get ( "sportobjectid" ).toString () )){
                 id=item.getId ();
                 favouriteObjects=item;
                 System.out.println (id );
