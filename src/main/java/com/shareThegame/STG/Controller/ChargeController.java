@@ -24,7 +24,7 @@ public class ChargeController {
     private
     PaymentHistoryRepository paymentHistoryRepository;
 
-    @PostMapping ( value = "/charge", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/charge", produces = "application/json" )
     @ResponseBody
     public String charge ( @RequestBody String  object )throws StripeException {
         JSONObject js=new JSONObject ( object );
