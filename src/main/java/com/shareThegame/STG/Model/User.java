@@ -160,10 +160,10 @@ class User {
     void setPhoto ( String photoToConvert ) {
         this.photo =Base64.getDecoder ( ).decode (photoToConvert  );
     }
-//    public
-//    void setPhoto ( byte[]photo ) {
-//        this.photo =photo;
-//    }
+  public
+   void setPhoto ( byte[]photo ) {
+        this.photo =photo;
+    }
     public
     List <FavouriteObjects> getFavouriteObjects ( ) {
         return favouriteObjects;

@@ -161,7 +161,7 @@ class TimeTableController {
 
     }
 
-    @GetMapping ( value = "/returnTimetableOfSportObject", produces = "application/json" )
+    @PostMapping ( value = "/returnTimetableOfSportObject", produces = "application/json" )
     public @ResponseBody
     String returnTimetableOfSportObject ( @RequestBody String  jsonData ) {
 
@@ -343,7 +343,9 @@ class TimeTableController {
         User user = userRepository.findByEmail ( useremial );
         Long sportobjectid=Long.valueOf ( new JSONObject ( jsonData ).get ( "sportobjectid" ).toString () );
         Long id=Long.valueOf ( new JSONObject ( jsonData ).get ( "id" ).toString () );
-        TimeTable timeTableToDelete = timeTableReposiotry.findBySportobjectidAndId ( sportobjectid,id );
+        DateTime start = pasreDate ( new JSONObject (  jsonData ).get ( "start" ).toString () );
+        DateTime end = pasreDate ( new JSONObject ( jsonData ).get ( "end" ).toString () );
+        TimeTable timeTableToDelete = timeTableReposiotry.findByStartrentAndEndrendAndSportobjectid ( start.toDate () ,end.toDate () ,sportobjectid );
         if ( timeTableToDelete != null ) {
 
 

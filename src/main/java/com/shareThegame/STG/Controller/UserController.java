@@ -9,12 +9,15 @@ import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.jws.soap.SOAPBinding;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +81,13 @@ public class UserController {
                 user.setSportObjects ( new ArrayList <> (  ) );
                 user.setPaymentHisotries ( new ArrayList <> (  ) );
                 user.setFavouriteObjects ( new ArrayList <> (  ) );
+                byte[] fileContent = null;
+                try {
+                    ClassPathResource imgFile = new ClassPathResource ( "img/2.jpg" );
+                    user.setPhoto ( StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) ) );
+                } catch ( IOException e ) {
+                    e.printStackTrace ( );
+                }
 
                 user.setActive ( 1 );
 
@@ -263,28 +273,32 @@ public class UserController {
             return new JSONObject ( ).put ( "message","UPDATE_ERROR" ).toString ();
         }
     }
-/*    @PostMapping ( value = "/getPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+    @PostMapping ( value = "/getPhoto", produces = "application/json" )
     public @ResponseBody
     String getPhoto(){
         User user=userRepository.findByEmail (userAuth () );
         JSONObject js=new JSONObject (  );
-       // js.put ( "photo",user.getPhoto () );
+        js.put ( "photo",user.getPhoto () );
         return  js.toString ();
 
 
     }
-    @PostMapping ( value = "/addPhoto", produces = "application/json", consumes = "application/x-www-form-urlencoded;charset=UTF-8" )
+
+    @PostMapping ( value = "/addPhoto", produces = "application/json" )
     public @ResponseBody
-    String addPhoto(String photo){
+    String addPhoto(@RequestBody  String photo){
+        JSONObject jsonphot=new JSONObject ( photo );
+
         User user=userRepository.findByEmail (userAuth () );
-        user.setPhoto ( photo );
+        user.setPhoto ( jsonphot.get ( "photo" ).toString () );
         userRepository.save ( user );
         JSONObject js=new JSONObject (  );
         js.put ( "photo","add" );
         return  js.toString ();
 
 
-    }*/
+    }
+
     @PostMapping(value = "/deleteUser",produces = "application/json")
     public @ResponseBody
     String deleteUser(){

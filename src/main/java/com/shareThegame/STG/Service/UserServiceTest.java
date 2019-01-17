@@ -234,6 +234,14 @@ class UserServiceTest {
             test.getSportObjects ( ).add ( sportObject );
             test.setFavouriteObjects ( new ArrayList <> ( ) );
             test.getFavouriteObjects ( ).add ( favouriteObject );
+            byte[] fileContent1 = null;
+            try {
+                ClassPathResource imgFile = new ClassPathResource ( "img/2.jpg" );
+                test.setPhoto ( StreamUtils.copyToByteArray ( imgFile.getInputStream ( ) ) );
+            } catch ( IOException e ) {
+                e.printStackTrace ( );
+            }
+
 
             System.out.println ( "inializuje uytkonikow" );
             test.setPaymentHisotries ( new ArrayList <> ( ) );

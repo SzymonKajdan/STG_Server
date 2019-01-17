@@ -54,6 +54,7 @@ class SportObjectController {
     public @ResponseBody
     String addNewObject ( @RequestBody String  object){
         String useremail=userAuth ();
+        System.out.println (object );
         User user=userRepository.findByEmail ( useremail );
 
         JSONObject json =new JSONObject ( object );
